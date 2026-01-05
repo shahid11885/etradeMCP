@@ -1,0 +1,15 @@
+# Virtual environments
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Config with secrets (use config.ini.example instead)
+config.ini
