@@ -1,102 +1,98 @@
 import json
 import logging
-from logging.handlers import RotatingFileHandler
-
-# logger settings
-logger = logging.getLogger('my_logger')
-logger.setLevel(logging.DEBUG)
-handler = RotatingFileHandler("python_client.log", maxBytes=5 * 1024 * 1024, backupCount=3)
-FORMAT = "%(asctime)-15s %(message)s"
-fmt = logging.Formatter(FORMAT, datefmt='%m/%d/%Y %I:%M:%S %p')
-handler.setFormatter(fmt)
-logger.addHandler(handler)
-
+from client_logger import logger
 
 class Market:
     def __init__(self, session, base_url):
         self.session = session
         self.base_url = base_url
 
-    def quotes(self):
+    def fetch_quote(self, symbols):
         """
-        Calls quotes API to provide quote details for equities, options, and mutual funds
-
-        :param self: Passes authenticated session in parameter
+        Fetches quotes for the given symbols.
+        :param symbols: A string of comma-separated symbols (e.g., "AAPL,GOOG") or a list of symbols.
+        :return: List of quote data dictionaries.
         """
-        symbols = input("\nPlease enter Stock Symbol: ")
-
-        # URL for the API endpoint
+        if isinstance(symbols, list):
+            symbols = ",".join(symbols)
+            
         url = self.base_url + "/v1/market/quote/" + symbols + ".json"
-
-        # Make API call for GET request
         response = self.session.get(url)
         logger.debug("Request Header: %s", response.request.headers)
 
         if response is not None and response.status_code == 200:
-
             parsed = json.loads(response.text)
             logger.debug("Response Body: %s", json.dumps(parsed, indent=4, sort_keys=True))
-
-            # Handle and parse response
             data = response.json()
+            
             if data is not None and "QuoteResponse" in data and "QuoteData" in data["QuoteResponse"]:
-                quotes_data = data["QuoteResponse"]["QuoteData"]
-
-                # Print table header
-                print("\n" + "=" * 80)
-                print(f"{'MARKET QUOTES':^80}")
-                print("=" * 80)
-
-                for quote in quotes_data:
-                    all_data = quote.get("All", {})
-                    product = quote.get("Product", {})
-
-                    symbol = product.get("symbol", "N/A")
-                    sec_type = product.get("securityType", "N/A")
-                    date_time = quote.get("dateTime", "N/A")
-
-                    last_price = all_data.get("lastTrade", 0)
-                    change = all_data.get("changeClose", 0)
-                    change_pct = all_data.get("changeClosePercentage", 0)
-                    prev_close = all_data.get("previousClose", 0)
-                    bid = all_data.get("bid", 0)
-                    bid_size = all_data.get("bidSize", 0)
-                    ask = all_data.get("ask", 0)
-                    ask_size = all_data.get("askSize", 0)
-                    low = all_data.get("low", 0)
-                    high = all_data.get("high", 0)
-                    volume = all_data.get("totalVolume", 0)
-
-                    # Determine change color indicator
-                    change_indicator = "▲" if change >= 0 else "▼"
-
-                    print(f"\n  {symbol} ({sec_type})")
-                    print(f"  {date_time}")
-                    print("-" * 80)
-                    print(f"  {'Last Price:':<20} ${last_price:>12,.2f}")
-                    print(f"  {'Change:':<20} {change_indicator} {change:>+10,.2f} ({change_pct:+.2f}%)")
-                    print("-" * 80)
-                    print(f"  {'Previous Close:':<20} ${prev_close:>12,.2f}")
-                    print(f"  {'Day Range:':<20} ${low:>10,.2f} - ${high:,.2f}")
-                    print("-" * 80)
-                    print(f"  {'Bid:':<20} ${bid:>12,.2f} x {bid_size}")
-                    print(f"  {'Ask:':<20} ${ask:>12,.2f} x {ask_size}")
-                    print("-" * 80)
-                    print(f"  {'Volume:':<20} {volume:>13,}")
-
-                print("\n" + "=" * 80)
+                return data["QuoteResponse"]["QuoteData"]
             else:
-                # Handle errors
-                if data is not None and 'QuoteResponse' in data and 'Messages' in data["QuoteResponse"] \
-                        and 'Message' in data["QuoteResponse"]["Messages"] \
-                        and data["QuoteResponse"]["Messages"]["Message"] is not None:
-                    for error_message in data["QuoteResponse"]["Messages"]["Message"]:
-                        print("Error: " + error_message["description"])
-                else:
-                    print("Error: Quote API service error")
+                 if (data is not None and 'QuoteResponse' in data and 'Messages' in data["QuoteResponse"]
+                        and 'Message' in data["QuoteResponse"]["Messages"]
+                        and data["QuoteResponse"]["Messages"]["Message"] is not None):
+                     messages = [m["description"] for m in data["QuoteResponse"]["Messages"]["Message"]]
+                     raise Exception(f"API Error: {', '.join(messages)}")
+                 raise Exception("Quote API service error")
         else:
             logger.debug("Response Body: %s", response)
-            print("Error: Quote API service error")
+            raise Exception("Quote API service error")
+
+    def quotes(self):
+        """
+        Calls quotes API to provide quote details for equities, options, and mutual funds
+        """
+        symbols = input("\nPlease enter Stock Symbol: ")
+        
+        try:
+            quotes_data = self.fetch_quote(symbols)
+            
+            # Print table header
+            print("\n" + "=" * 80)
+            print(f"{ 'MARKET QUOTES':^80}")
+            print("=" * 80)
+
+            for quote in quotes_data:
+                all_data = quote.get("All", {})
+                product = quote.get("Product", {})
+
+                symbol = product.get("symbol", "N/A")
+                sec_type = product.get("securityType", "N/A")
+                date_time = quote.get("dateTime", "N/A")
+
+                last_price = all_data.get("lastTrade", 0)
+                change = all_data.get("changeClose", 0)
+                change_pct = all_data.get("changeClosePercentage", 0)
+                prev_close = all_data.get("previousClose", 0)
+                bid = all_data.get("bid", 0)
+                bid_size = all_data.get("bidSize", 0)
+                ask = all_data.get("ask", 0)
+                ask_size = all_data.get("askSize", 0)
+                low = all_data.get("low", 0)
+                high = all_data.get("high", 0)
+                volume = all_data.get("totalVolume", 0)
+
+                # Determine change color indicator
+                change_indicator = "▲" if change >= 0 else "▼"
+
+                print(f"\n  {symbol} ({sec_type})")
+                print(f"  {date_time}")
+                print("-" * 80)
+                print(f"  {'Last Price:':<20} ${last_price:>12,.2f}")
+                print(f"  {'Change:':<20} {change_indicator} {change:>+10,.2f} ({change_pct:+.2f}%)")
+                print("-" * 80)
+                print(f"  {'Previous Close:':<20} ${prev_close:>12,.2f}")
+                print(f"  {'Day Range:':<20} ${low:>10,.2f} - ${high:,.2f}")
+                print("-" * 80)
+                print(f"  {'Bid:':<20} ${bid:>12,.2f} x {bid_size}")
+                print(f"  {'Ask:':<20} ${ask:>12,.2f} x {ask_size}")
+                print("-" * 80)
+                print(f"  {'Volume:':<20} {volume:>13,}")
+
+            print("\n" + "=" * 80)
+        except Exception as e:
+             print(f"Error: {e}")
+
 
     def option_expire_dates(self):
         """
@@ -145,7 +141,7 @@ class Market:
 
                 # Print table header
                 print("\n" + "=" * 60)
-                print(f"{'OPTION EXPIRATION DATES - ' + symbol.upper():^60}")
+                print(f"{ 'OPTION EXPIRATION DATES - ' + symbol.upper():^60}")
                 print("=" * 60)
                 print(f"  {'#':<4} {'Date':<20} {'Type':<15}")
                 print("-" * 60)
@@ -254,8 +250,8 @@ class Market:
 
                 # Print table header
                 print("\n" + "=" * 120)
-                print(f"{'OPTION CHAIN - ' + symbol.upper():^120}")
-                print(f"{'Expiration: ' + exp_date_str + ' | Near Price: $' + str(near_price):^120}")
+                print(f"{ 'OPTION CHAIN - ' + symbol.upper():^120}")
+                print(f"{ 'Expiration: ' + exp_date_str + ' | Near Price: $' + str(near_price):^120}")
                 print("=" * 120)
 
                 if params["chainType"] in ["CALLPUT", "CALL"]:

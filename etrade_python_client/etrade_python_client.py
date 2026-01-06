@@ -5,29 +5,26 @@ import json
 import logging
 import configparser
 import sys
+import os
 import requests
 from rauth import OAuth1Service
-from logging.handlers import RotatingFileHandler
+from client_logger import logger
 from accounts.accounts import Accounts
 from market.market import Market
 
 # loading configuration file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(os.path.join(BASE_DIR, 'config.ini'))
 
 # logger settings
-logger = logging.getLogger('my_logger')
-logger.setLevel(logging.DEBUG)
-handler = RotatingFileHandler("python_client.log", maxBytes=5*1024*1024, backupCount=3)
-FORMAT = "%(asctime)-15s %(message)s"
-fmt = logging.Formatter(FORMAT, datefmt='%m/%d/%Y %I:%M:%S %p')
-handler.setFormatter(fmt)
-logger.addHandler(handler)
+# (Managed by client_logger, which is imported)
 
+TOKEN_FILE = os.path.join(BASE_DIR, 'tokens.json')
 
-def oauth():
-    """Allows user authorization for the sample application with OAuth 1"""
-    etrade = OAuth1Service(
+def get_etrade_service():
+    """Initializes and returns the OAuth1Service"""
+    return OAuth1Service(
         name="etrade",
         consumer_key=config["DEFAULT"]["CONSUMER_KEY"],
         consumer_secret=config["DEFAULT"]["CONSUMER_SECRET"],
@@ -36,6 +33,45 @@ def oauth():
         authorize_url="https://us.etrade.com/e/t/etws/authorize?key={}&token={}",
         base_url="https://api.etrade.com")
 
+def save_tokens(token, secret, base_url):
+    """Saves the access token and secret to a file"""
+    data = {
+        "access_token": token,
+        "access_token_secret": secret,
+        "base_url": base_url
+    }
+    with open(TOKEN_FILE, 'w') as f:
+        json.dump(data, f)
+    logger.info("Tokens saved to %s", TOKEN_FILE)
+
+def load_tokens():
+    """Loads the access token and secret from a file"""
+    if os.path.exists(TOKEN_FILE):
+        try:
+            with open(TOKEN_FILE, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error("Error loading tokens: %s", e)
+    return None
+
+def get_session(headless=False):
+    """
+    Returns an authenticated session.
+    If headless is True, it will only try to load from file and raise error if not found.
+    """
+    tokens = load_tokens()
+    etrade = get_etrade_service()
+
+    if tokens:
+        session = etrade.get_session(
+            (tokens["access_token"], tokens["access_token_secret"])
+        )
+        return session, tokens["base_url"]
+    
+    if headless:
+        raise Exception("No saved tokens found. Please run the CLI application first to authenticate.")
+
+    # Interactive Auth Flow
     menu_items = {"1": "Sandbox Consumer Key",
                   "2": "Live Consumer Key",
                   "3": "Exit"}
@@ -52,7 +88,7 @@ def oauth():
             base_url = config["DEFAULT"]["PROD_BASE_URL"]
             break
         elif selection == "3":
-            break
+            sys.exit(0)
         else:
             print("Unknown Option Selected!")
     print("")
@@ -62,18 +98,26 @@ def oauth():
         params={"oauth_callback": "oob", "format": "json"})
 
     # Step 2: Go through the authentication flow. Login to E*TRADE.
-    # After you login, the page will provide a verification code to enter.
     authorize_url = etrade.authorize_url.format(etrade.consumer_key, request_token)
     webbrowser.open(authorize_url)
-    text_code = input("Please accept agreement and enter verification code from browser: ")
+    print("Please accept agreement and enter verification code from browser.")
+    text_code = input("Verification Code: ")
 
     # Step 3: Exchange the authorized request token for an authenticated OAuth 1 session
     session = etrade.get_auth_session(request_token,
                                   request_token_secret,
                                   params={"oauth_verifier": text_code})
 
-    main_menu(session, base_url)
+    save_tokens(session.access_token, session.access_token_secret, base_url)
+    return session, base_url
 
+def oauth():
+    """Allows user authorization for the sample application with OAuth 1"""
+    try:
+        session, base_url = get_session()
+        main_menu(session, base_url)
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 def main_menu(session, base_url):
     """
