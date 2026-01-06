@@ -72,6 +72,19 @@ def main():
     except Exception as e:
         print(f"   Failed: {e}")
 
+    # 6. Get Option Expiry Dates
+    print("\n6. Testing 'get_option_expire_dates' for AAPL...")
+    try:
+        dates = market_client.fetch_option_expire_dates("AAPL")
+        if dates:
+            print(f"   Found {len(dates)} expiry dates.")
+            first_date = dates[0]
+            print(f"   First date: {first_date.get('month')}/{first_date.get('day')}/{first_date.get('year')} ({first_date.get('expiryType')})")
+        else:
+            print("   No expiry dates returned.")
+    except Exception as e:
+        print(f"   Failed: {e}")
+
     print("\n--- Test Complete ---")
 
 if __name__ == "__main__":

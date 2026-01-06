@@ -94,6 +94,37 @@ class Market:
              print(f"Error: {e}")
 
 
+    def fetch_option_expire_dates(self, symbol, expiry_type=None):
+        """
+        Fetches option expiration dates for a given symbol.
+        :param symbol: The stock symbol.
+        :param expiry_type: Optional filter (ALL, WEEKLY, MONTHLY, QUARTERLY).
+        :return: List of expiration date dictionaries.
+        """
+        url = self.base_url + "/v1/market/optionexpiredate.json"
+        params = {"symbol": symbol}
+        if expiry_type:
+            params["expiryType"] = expiry_type
+
+        response = self.session.get(url, params=params)
+        logger.debug("Request Header: %s", response.request.headers)
+
+        if response is not None and response.status_code == 200:
+            parsed = json.loads(response.text)
+            logger.debug("Response Body: %s", json.dumps(parsed, indent=4, sort_keys=True))
+            data = response.json()
+            
+            if data is not None and "OptionExpireDateResponse" in data \
+                    and "ExpirationDate" in data["OptionExpireDateResponse"]:
+                return data["OptionExpireDateResponse"]["ExpirationDate"]
+            elif data is not None and "Error" in data and "message" in data["Error"]:
+                raise Exception(data["Error"]["message"])
+            else:
+                raise Exception("Option Expire Date API service error")
+        else:
+            logger.debug("Response Body: %s", response)
+            raise Exception("Option Expire Date API service error")
+
     def option_expire_dates(self):
         """
         Calls option expire dates API to retrieve expiration dates for a given symbol
@@ -120,61 +151,31 @@ class Market:
         expiry_selection = input("Select expiry type (default: 5): ").strip() or "5"
         expiry_type = expiry_types.get(expiry_selection, None)
 
-        # Build URL for the API endpoint
-        url = self.base_url + "/v1/market/optionexpiredate.json"
-        params = {"symbol": symbol}
-        if expiry_type:
-            params["expiryType"] = expiry_type
+        try:
+            expiration_dates = self.fetch_option_expire_dates(symbol, expiry_type)
 
-        # Make API call for GET request
-        response = self.session.get(url, params=params)
-        logger.debug("Request Header: %s", response.request.headers)
+            # Print table header
+            print("\n" + "=" * 60)
+            print(f"{ 'OPTION EXPIRATION DATES - ' + symbol.upper():^60}")
+            print("=" * 60)
+            print(f"  {'#':<4} {'Date':<20} {'Type':<15}")
+            print("-" * 60)
 
-        if response is not None and response.status_code == 200:
-            parsed = json.loads(response.text)
-            logger.debug("Response Body: %s", json.dumps(parsed, indent=4, sort_keys=True))
+            for idx, exp_date in enumerate(expiration_dates, 1):
+                year = exp_date.get("year", 0)
+                month = exp_date.get("month", 0)
+                day = exp_date.get("day", 0)
+                exp_type = exp_date.get("expiryType", "N/A")
 
-            data = response.json()
-            if data is not None and "OptionExpireDateResponse" in data \
-                    and "ExpirationDate" in data["OptionExpireDateResponse"]:
-                expiration_dates = data["OptionExpireDateResponse"]["ExpirationDate"]
+                date_str = f"{month:02d}/{day:02d}/{year}"
+                print(f"  {idx:<4} {date_str:<20} {exp_type:<15}")
 
-                # Print table header
-                print("\n" + "=" * 60)
-                print(f"{ 'OPTION EXPIRATION DATES - ' + symbol.upper():^60}")
-                print("=" * 60)
-                print(f"  {'#':<4} {'Date':<20} {'Type':<15}")
-                print("-" * 60)
+            print("-" * 60)
+            print(f"  Total: {len(expiration_dates)} expiration dates")
+            print("=" * 60)
 
-                for idx, exp_date in enumerate(expiration_dates, 1):
-                    year = exp_date.get("year", 0)
-                    month = exp_date.get("month", 0)
-                    day = exp_date.get("day", 0)
-                    exp_type = exp_date.get("expiryType", "N/A")
-
-                    date_str = f"{month:02d}/{day:02d}/{year}"
-                    print(f"  {idx:<4} {date_str:<20} {exp_type:<15}")
-
-                print("-" * 60)
-                print(f"  Total: {len(expiration_dates)} expiration dates")
-                print("=" * 60)
-            else:
-                # Handle errors
-                if data is not None and "Error" in data and "message" in data["Error"]:
-                    print("Error: " + data["Error"]["message"])
-                else:
-                    print("Error: Option Expire Date API service error")
-        else:
-            logger.debug("Response Body: %s", response)
-            if response is not None:
-                try:
-                    error_data = response.json()
-                    if "Error" in error_data and "message" in error_data["Error"]:
-                        print("Error: " + error_data["Error"]["message"])
-                    else:
-                        print("Error: Option Expire Date API service error")
-                except:
-                    print("Error: Option Expire Date API service error")
+        except Exception as e:
+            print(f"Error: {e}")
 
     def option_chains(self):
         """

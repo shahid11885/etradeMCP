@@ -71,5 +71,19 @@ def get_quote(symbols: list[str]) -> list:
     _, mkt = get_clients()
     return mkt.fetch_quote(symbols)
 
+@mcp.tool()
+def get_option_expire_dates(symbol: str, expiry_type: str = None) -> list:
+    """
+    Get option expiration dates for a specific symbol.
+    Args:
+        symbol: The stock symbol (e.g., "AAPL").
+        expiry_type: Optional filter. One of: "ALL", "WEEKLY", "MONTHLY", "QUARTERLY".
+                     If omitted, defaults to no filter.
+    Returns:
+        A list of expiration date dictionaries.
+    """
+    _, mkt = get_clients()
+    return mkt.fetch_option_expire_dates(symbol, expiry_type)
+
 if __name__ == "__main__":
     mcp.run()
