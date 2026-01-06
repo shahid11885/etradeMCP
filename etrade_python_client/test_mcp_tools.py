@@ -80,10 +80,43 @@ def main():
             print(f"   Found {len(dates)} expiry dates.")
             first_date = dates[0]
             print(f"   First date: {first_date.get('month')}/{first_date.get('day')}/{first_date.get('year')} ({first_date.get('expiryType')})")
+            
+            # Use this date for the next test
+            exp_year = first_date.get('year')
+            exp_month = first_date.get('month')
+            exp_day = first_date.get('day')
         else:
             print("   No expiry dates returned.")
+            exp_year, exp_month, exp_day = None, None, None
     except Exception as e:
         print(f"   Failed: {e}")
+        exp_year, exp_month, exp_day = None, None, None
+
+    # 7. Get Option Chains
+    if exp_year:
+        print(f"\n7. Testing 'get_option_chains' for AAPL expiring on {exp_month}/{exp_day}/{exp_year}...")
+        try:
+            chain = market_client.fetch_option_chains(
+                "AAPL", 
+                expiry_year=exp_year, 
+                expiry_month=exp_month, 
+                expiry_day=exp_day,
+                chain_type="CALL",
+                no_of_strikes=2
+            )
+            if chain:
+                pairs = chain.get("OptionPair", [])
+                print(f"   Retrieved {len(pairs)} option pairs.")
+                if pairs:
+                    first_call = pairs[0].get("Call")
+                    if first_call:
+                        print(f"   Sample Call: Strike=${first_call.get('strikePrice')} Last=${first_call.get('lastPrice')}")
+            else:
+                print("   No option chain data returned.")
+        except Exception as e:
+            print(f"   Failed: {e}")
+    else:
+        print("\n7. Skipping 'get_option_chains' (no expiry date available).")
 
     print("\n--- Test Complete ---")
 

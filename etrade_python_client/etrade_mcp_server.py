@@ -85,5 +85,34 @@ def get_option_expire_dates(symbol: str, expiry_type: str = None) -> list:
     _, mkt = get_clients()
     return mkt.fetch_option_expire_dates(symbol, expiry_type)
 
+@mcp.tool()
+def get_option_chains(symbol: str, expiry_year: int = None, expiry_month: int = None, expiry_day: int = None,
+                      chain_type: str = "CALLPUT", strike_price_near: float = None, no_of_strikes: int = None,
+                      include_weekly: bool = False, skip_adjusted: bool = True, option_category: str = "STANDARD",
+                      price_type: str = "ATNM") -> dict:
+    """
+    Get option chain data for a specific symbol.
+    Args:
+        symbol: The stock symbol (e.g., "AAPL").
+        expiry_year: Expiration year (e.g., 2026).
+        expiry_month: Expiration month (1-12).
+        expiry_day: Expiration day (1-31).
+        chain_type: Type of options to return. One of: "CALLPUT", "CALL", "PUT".
+        strike_price_near: Filter for strike prices near this value.
+        no_of_strikes: Number of strikes to return.
+        include_weekly: Whether to include weekly options.
+        skip_adjusted: Whether to skip adjusted options.
+        option_category: "STANDARD", "ALL", or "MINI".
+        price_type: "ATNM" (At The Money) or "ALL".
+    Returns:
+        A dictionary containing the option chain response.
+    """
+    _, mkt = get_clients()
+    return mkt.fetch_option_chains(
+        symbol, expiry_year, expiry_month, expiry_day,
+        chain_type, strike_price_near, no_of_strikes,
+        include_weekly, skip_adjusted, option_category, price_type
+    )
+
 if __name__ == "__main__":
     mcp.run()

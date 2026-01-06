@@ -177,54 +177,27 @@ class Market:
         except Exception as e:
             print(f"Error: {e}")
 
-    def option_chains(self):
+    def fetch_option_chains(self, symbol, expiry_year=None, expiry_month=None, expiry_day=None,
+                           chain_type="CALLPUT", strike_price_near=None, no_of_strikes=None,
+                           include_weekly=False, skip_adjusted=True, option_category="STANDARD",
+                           price_type="ATNM"):
         """
-        Calls option chains API to retrieve option chain data for a given symbol
-
-        :param self: Passes authenticated session in parameter
+        Fetches option chains for a given symbol.
+        :return: Dict containing the OptionChainResponse.
         """
-        symbol = input("\nPlease enter Stock Symbol: ")
-
         # Build parameters
-        params = {"symbol": symbol}
-
-        # Expiration date (optional)
-        print("\nEnter expiration date (leave blank to skip):")
-        expiry_year = input("  Expiry Year (e.g., 2026): ").strip()
-        if expiry_year:
-            params["expiryYear"] = expiry_year
-            expiry_month = input("  Expiry Month (1-12): ").strip()
-            if expiry_month:
-                params["expiryMonth"] = expiry_month
-            expiry_day = input("  Expiry Day (1-31): ").strip()
-            if expiry_day:
-                params["expiryDay"] = expiry_day
-
-        # Chain type
-        chain_types = {"1": "CALLPUT", "2": "CALL", "3": "PUT"}
-        print("\nChain Type:")
-        print("1)\tCalls and Puts (default)")
-        print("2)\tCalls Only")
-        print("3)\tPuts Only")
-        chain_selection = input("Select chain type (default: 1): ").strip() or "1"
-        params["chainType"] = chain_types.get(chain_selection, "CALLPUT")
-
-        # Strike price filter
-        strike_near = input("\nStrike price near (leave blank for default): ").strip()
-        if strike_near:
-            params["strikePriceNear"] = strike_near
-
-        # Number of strikes
-        no_of_strikes = input("Number of strikes to retrieve (leave blank for default): ").strip()
-        if no_of_strikes:
-            params["noOfStrikes"] = no_of_strikes
-
-        # Include weekly options
-        print("\nInclude weekly options?")
-        print("1)\tNo (default)")
-        print("2)\tYes")
-        weekly_selection = input("Select (default: 1): ").strip() or "1"
-        params["includeWeekly"] = "true" if weekly_selection == "2" else "false"
+        params = {"symbol": symbol, "chainType": chain_type}
+        
+        if expiry_year: params["expiryYear"] = expiry_year
+        if expiry_month: params["expiryMonth"] = expiry_month
+        if expiry_day: params["expiryDay"] = expiry_day
+        if strike_price_near: params["strikePriceNear"] = strike_price_near
+        if no_of_strikes: params["noOfStrikes"] = no_of_strikes
+        
+        params["includeWeekly"] = "true" if include_weekly else "false"
+        params["skipAdjusted"] = "true" if skip_adjusted else "false"
+        params["optionCategory"] = option_category
+        params["priceType"] = price_type
 
         # Build URL for the API endpoint
         url = self.base_url + "/v1/market/optionchains.json"
@@ -239,57 +212,104 @@ class Market:
 
             data = response.json()
             if data is not None and "OptionChainResponse" in data:
-                chain_response = data["OptionChainResponse"]
-                option_pairs = chain_response.get("OptionPair", [])
-                near_price = chain_response.get("nearPrice", 0)
-                selected = chain_response.get("SelectedED", {})
-
-                exp_month = selected.get("month", "")
-                exp_day = selected.get("day", "")
-                exp_year = selected.get("year", "")
-                exp_date_str = f"{exp_month}/{exp_day}/{exp_year}" if exp_year else "N/A"
-
-                # Print table header
-                print("\n" + "=" * 120)
-                print(f"{ 'OPTION CHAIN - ' + symbol.upper():^120}")
-                print(f"{ 'Expiration: ' + exp_date_str + ' | Near Price: $' + str(near_price):^120}")
-                print("=" * 120)
-
-                if params["chainType"] in ["CALLPUT", "CALL"]:
-                    self._print_option_chain_header("CALLS")
-                    for pair in option_pairs:
-                        call = pair.get("Call")
-                        if call:
-                            self._print_option_row(call)
-                    print("-" * 120)
-
-                if params["chainType"] in ["CALLPUT", "PUT"]:
-                    self._print_option_chain_header("PUTS")
-                    for pair in option_pairs:
-                        put = pair.get("Put")
-                        if put:
-                            self._print_option_row(put)
-                    print("-" * 120)
-
-                print(f"\n  Total Option Pairs: {len(option_pairs)}")
-                print("=" * 120)
+                return data["OptionChainResponse"]
+            elif data is not None and "Error" in data and "message" in data["Error"]:
+                raise Exception(data["Error"]["message"])
             else:
-                # Handle errors
-                if data is not None and "Error" in data and "message" in data["Error"]:
-                    print("Error: " + data["Error"]["message"])
-                else:
-                    print("Error: Option Chain API service error")
+                raise Exception("Option Chain API service error")
         else:
             logger.debug("Response Body: %s", response)
             if response is not None:
                 try:
                     error_data = response.json()
                     if "Error" in error_data and "message" in error_data["Error"]:
-                        print("Error: " + error_data["Error"]["message"])
-                    else:
-                        print("Error: Option Chain API service error")
+                        raise Exception(error_data["Error"]["message"])
                 except:
-                    print("Error: Option Chain API service error")
+                    pass
+            raise Exception("Option Chain API service error")
+
+    def option_chains(self):
+        """
+        Calls option chains API to retrieve option chain data for a given symbol
+
+        :param self: Passes authenticated session in parameter
+        """
+        symbol = input("\nPlease enter Stock Symbol: ")
+        
+        # Expiration date (optional)
+        print("\nEnter expiration date (leave blank to skip):")
+        expiry_year = input("  Expiry Year (e.g., 2026): ").strip()
+        expiry_month = None
+        expiry_day = None
+        
+        if expiry_year:
+            expiry_month = input("  Expiry Month (1-12): ").strip()
+            expiry_day = input("  Expiry Day (1-31): ").strip()
+
+        # Chain type
+        chain_types = {"1": "CALLPUT", "2": "CALL", "3": "PUT"}
+        print("\nChain Type:")
+        print("1)\tCalls and Puts (default)")
+        print("2)\tCalls Only")
+        print("3)\tPuts Only")
+        chain_selection = input("Select chain type (default: 1): ").strip() or "1"
+        chain_type = chain_types.get(chain_selection, "CALLPUT")
+
+        # Strike price filter
+        strike_near = input("\nStrike price near (leave blank for default): ").strip()
+        
+        # Number of strikes
+        no_of_strikes = input("Number of strikes to retrieve (leave blank for default): ").strip()
+
+        # Include weekly options
+        print("\nInclude weekly options?")
+        print("1)\tNo (default)")
+        print("2)\tYes")
+        weekly_selection = input("Select (default: 1): ").strip() or "1"
+        include_weekly = True if weekly_selection == "2" else False
+
+        try:
+            chain_response = self.fetch_option_chains(
+                symbol, expiry_year, expiry_month, expiry_day,
+                chain_type, strike_near, no_of_strikes, include_weekly
+            )
+            
+            option_pairs = chain_response.get("OptionPair", [])
+            near_price = chain_response.get("nearPrice", 0)
+            selected = chain_response.get("SelectedED", {})
+
+            exp_month = selected.get("month", "")
+            exp_day = selected.get("day", "")
+            exp_year = selected.get("year", "")
+            exp_date_str = f"{exp_month}/{exp_day}/{exp_year}" if exp_year else "N/A"
+
+            # Print table header
+            print("\n" + "=" * 120)
+            print(f"{ 'OPTION CHAIN - ' + symbol.upper():^120}")
+            print(f"{ 'Expiration: ' + exp_date_str + ' | Near Price: $' + str(near_price):^120}")
+            print("=" * 120)
+
+            if chain_type in ["CALLPUT", "CALL"]:
+                self._print_option_chain_header("CALLS")
+                for pair in option_pairs:
+                    call = pair.get("Call")
+                    if call:
+                        self._print_option_row(call)
+                print("-" * 120)
+
+            if chain_type in ["CALLPUT", "PUT"]:
+                self._print_option_chain_header("PUTS")
+                for pair in option_pairs:
+                    put = pair.get("Put")
+                    if put:
+                        self._print_option_row(put)
+                print("-" * 120)
+
+            print(f"\n  Total Option Pairs: {len(option_pairs)}")
+            print("=" * 120)
+
+        except Exception as e:
+            print(f"Error: {e}")
 
     def _print_option_chain_header(self, option_type):
         """Print header row for option chain table"""
