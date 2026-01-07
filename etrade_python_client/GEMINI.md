@@ -9,12 +9,19 @@ This project provides both an interactive Command Line Interface (CLI) applicati
     - `etrade_mcp_server.py`: Implements an MCP server using `fastmcp` to expose E*TRADE functionality to LLM clients like Claude Desktop.
 - **Modules:**
     - `accounts/`: Contains the `Accounts` class for listing accounts, viewing portfolios, and checking balances.
-    - `market/`: Contains the `Market` class for retrieving stock quotes and option chains.
+    - `market/`: Contains the `Market` class for retrieving stock quotes, option chains, and expiration dates.
     - `order/`: Contains the `Order` class for previewing, viewing, and canceling orders.
-- **Configuration:**
-    - `config.ini`: Stores API credentials and base URLs.
-    - `tokens.json`: Stores authenticated session tokens for reuse (generated after first CLI login).
-- **Logging:** Logs debug information and API interactions to `python_client.log` via `client_logger.py`.
+
+## MCP Tools
+
+The `etrade_mcp_server.py` exposes the following tools to LLM clients:
+
+- `list_accounts()`: List all available brokerage accounts.
+- `get_portfolio(account_id_key)`: Get portfolio positions for a specific account.
+- `get_balance(account_id_key)`: Get balance details for a specific account.
+- `get_quote(symbols)`: Get real-time quotes for one or more stock symbols.
+- `get_option_expire_dates(symbol, expiry_type)`: Get option expiration dates for a symbol.
+- `get_option_chains(symbol, ...)`: Get detailed option chain data with various filters (expiry, strike, chain type).
 
 ## Building and Running
 
