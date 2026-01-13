@@ -10,6 +10,10 @@ __pycache__/
 
 # Logs
 *.log
+*.html
 
 # Config with secrets (use config.ini.example instead)
 config.ini
+
+etrade_python_client/Application
+
