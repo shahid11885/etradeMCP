@@ -2,6 +2,16 @@
 
 # This script automates the setup of the Python virtual environment.
 
+# Create logs directory if it doesn't exist
+if [ ! -d "logs" ]; then
+    echo "Creating 'logs' directory..."
+    mkdir logs
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to create 'logs' directory."
+        exit 1
+    fi
+fi
+
 # Check if the venv directory already exists
 if [ -d "venv" ]; then
     echo "Virtual environment 'venv' already exists."
@@ -22,15 +32,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Create logs directory if it doesn't exist
-if [ ! -d "logs" ]; then
-    echo "Creating 'logs' directory..."
-    mkdir logs
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to create 'logs' directory."
-        exit 1
-    fi
-fi
 
 echo ""
 echo "Environment setup complete."
