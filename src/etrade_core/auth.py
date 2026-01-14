@@ -11,10 +11,23 @@ from .client_logger import logger
 
 # loading configuration file
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-config = configparser.ConfigParser()
-config.read(os.path.join(project_root, 'config', 'config.ini'))
+config_file_path = os.path.join(project_root, 'config', 'config.ini')
+if not os.path.exists(config_file_path):
+    print("ERROR: Configuration file 'config.ini' not found.")
+    print("Please create 'config/config.ini' by copying 'config/config.ini.example' and")
+    print("editing it with your E*TRADE CONSUMER_KEY and CONSUMER_SECRET.")
+    sys.exit(1)
+config.read(config_file_path)
 
 TOKEN_FILE = os.path.join(project_root, 'config', 'tokens.json')
+
+def _validate_credentials(key, secret, key_type):
+    if not (isinstance(key, str) and len(key) >= 30 and key.isalnum()):
+        print(f"ERROR: {key_type} CONSUMER_KEY must be at least 30 alphanumeric characters long.")
+        sys.exit(1)
+    if not (isinstance(secret, str) and len(secret) >= 60 and secret.isalnum()):
+        print(f"ERROR: {key_type} CONSUMER_SECRET must be at least 60 alphanumeric characters long.")
+        sys.exit(1)
 
 def get_etrade_service(env="PROD"):
     """Initializes and returns the OAuth1Service"""
@@ -22,10 +35,12 @@ def get_etrade_service(env="PROD"):
         consumer_key        = config["DEFAULT"]["PROD_CONSUMER_KEY"]
         consumer_secret     = config["DEFAULT"]["PROD_CONSUMER_SECRET"]
         base_url            = config["DEFAULT"]["PROD_BASE_URL"]
+        _validate_credentials(consumer_key, consumer_secret, "PROD")
     else:  # SANDBOX
         consumer_key        = config["DEFAULT"]["SANDBOX_CONSUMER_KEY"]
         consumer_secret     = config["DEFAULT"]["SANDBOX_CONSUMER_SECRET"]
         base_url            = config["DEFAULT"]["SANDBOX_BASE_URL"]
+        _validate_credentials(consumer_key, consumer_secret, "SANDBOX")
 
     return OAuth1Service(
         name                = "etrade",
