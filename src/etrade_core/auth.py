@@ -23,9 +23,9 @@ config.read(config_file_path)
 TOKEN_FILE = os.path.join(project_root, 'config', 'tokens.json')
 
 def _validate_credentials(key, secret, key_type):
-    print(f"Validating {key_type} credentials...")
-    print(f"Key: {key}")
-    print(f"Secret: {secret}")
+    # print(f"Validating {key_type} credentials...")
+    # print(f"Key: {key}")
+    # print(f"Secret: {secret}")
 
     if not (isinstance(key, str) and len(key) >= 30 and key.isalnum()):
         print(f"ERROR: {key_type} CONSUMER_KEY must be at least 30 alphanumeric characters long.")
