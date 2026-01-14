@@ -58,4 +58,13 @@ def main_menu(session, base_url):
 
 
 if __name__ == "__main__":
-    oauth()
+    if len(sys.argv) > 1 and sys.argv[1] == "generate-tokens":
+        print("Generating E*TRADE tokens...")
+        try:
+            get_session()
+            print("Tokens generated and saved successfully in 'config/tokens.json'.")
+        except Exception as e:
+            print(f"An error occurred during token generation: {e}")
+    else:
+        oauth()
+

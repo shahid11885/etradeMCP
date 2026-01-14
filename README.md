@@ -77,13 +77,19 @@ On Unix or Mac OS, run:
 $ source venv/bin/activate
 ```
 
-2. Run the CLI application
+2. Run the CLI application to start the interactive menu:
 
 ```
 $ python src/cli/main.py
 ```
 
-3. Run the MCP server
+3. (Optional) To generate and save authentication tokens without the interactive menu, use:
+
+```
+$ python src/cli/main.py generate-tokens
+```
+
+4. Run the MCP server:
 
 ```
 $ python src/mcp/server.py

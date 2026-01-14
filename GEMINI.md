@@ -72,6 +72,13 @@ Run the application from the project's root directory:
 python src/cli/main.py
 ```
 
+#### Generating Tokens
+If you only need to generate and save the authentication tokens without running the interactive menu, you can use the `generate-tokens` command:
+```bash
+python src/cli/main.py generate-tokens
+```
+This is useful for setting up the `tokens.json` file for other applications, like the MCP server.
+
 #### MCP Server
 Once `config/tokens.json` is generated, you can run the MCP server:
 ```bash
