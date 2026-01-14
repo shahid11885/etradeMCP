@@ -12,7 +12,7 @@ source venv/bin/activate
 pip install -r ../requirements.txt
 
 # Run the application
-python etrade_python_client.py
+python etrade_client.py
 ```
 
 Note: The application must be run from the `etrade_python_client/` directory since it reads `config.ini` using a relative path.
@@ -22,13 +22,13 @@ Note: The application must be run from the `etrade_python_client/` directory sin
 This is an interactive CLI application for the E*TRADE API with OAuth 1 authentication.
 
 ### Entry Point Flow
-`etrade_python_client.py` → `oauth()` (browser-based auth) → `main_menu()` (interactive CLI)
+`etrade_client.py` → `oauth()` (browser-based auth) → `main_menu()` (interactive CLI)
 
 ### Module Structure
 
 ```
 etrade_python_client/
-├── etrade_python_client.py   # OAuth flow and main menu
+├── etrade_client.py   # OAuth flow and main menu
 ├── accounts/accounts.py      # Accounts class - list accounts, portfolio, balance
 ├── market/market.py          # Market class - stock quotes
 ├── order/order.py            # Order class - preview, view, cancel orders

@@ -24,7 +24,7 @@ Ensure you have installed the dependencies and configured your credentials.
 The MCP server uses saved tokens to authenticate. You must run the CLI application once to log in via the browser.
 
 ```bash
-python etrade_python_client.py
+python etrade_client.py
 ```
 *   Follow the prompts to log in to E*TRADE.
 *   Copy the verification code from the browser.
@@ -100,5 +100,5 @@ This is useful if you want to access the MCP server from remote clients or other
 
 ## Troubleshooting
 
-*   **"Authentication failed":** Delete `tokens.json` and run `python etrade_python_client.py` again.
+*   **"Authentication failed":** Delete `tokens.json` and run `python etrade_client.py` again.
 *   **"No module named 'fastmcp'":** Ensure you are in the correct virtual environment.

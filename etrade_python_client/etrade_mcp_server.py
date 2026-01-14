@@ -1,5 +1,5 @@
 from fastmcp import FastMCP
-from etrade_python_client import get_session
+from etrade_client import get_session
 from accounts.accounts import Accounts
 from market.market import Market
 

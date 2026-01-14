@@ -3,11 +3,13 @@ import logging
 import configparser
 import random
 import re
+import os
 from client_logger import logger
 
 # loading configuration file
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(os.path.join(BASE_DIR, 'config.ini'))
 
 class Order:
 
@@ -15,6 +17,12 @@ class Order:
         self.session = session
         self.account = account
         self.base_url = base_url
+        if self.base_url == config["DEFAULT"]["SANDBOX_BASE_URL"]:
+            self.consumer_key = config["DEFAULT"]["SANDBOX_CONSUMER_KEY"]
+            self.is_sandbox = True
+        else:
+            self.consumer_key = config["DEFAULT"]["PROD_CONSUMER_KEY"]
+            self.is_sandbox = False
 
     def preview_order(self):
         """
@@ -31,7 +39,7 @@ class Order:
         url = self.base_url + "/v1/accounts/" + self.account["accountIdKey"] + "/orders/preview.json"
 
         # Add parameters and header information
-        headers = {"Content-Type": "application/xml", "consumerKey": config["DEFAULT"]["CONSUMER_KEY"]}
+        headers = {"Content-Type": "application/xml", "consumerKey": self.consumer_key}
 
         # Add payload for POST Request
         payload = """<PreviewOrderRequest>
@@ -156,7 +164,7 @@ class Order:
                     url = self.base_url + "/v1/accounts/" + account["accountIdKey"] + "/orders/preview.json"
 
                     # Add parameters and header information
-                    headers = {"Content-Type": "application/xml", "consumerKey": config["DEFAULT"]["CONSUMER_KEY"]}
+                    headers = {"Content-Type": "application/xml", "consumerKey": self.consumer_key}
 
                     # Add payload for POST Request
                     payload = """<PreviewOrderRequest>
@@ -457,7 +465,7 @@ class Order:
 
             # Add parameters and header information
             params_open = {"status": "OPEN"}
-            headers = {"consumerkey": config["DEFAULT"]["CONSUMER_KEY"]}
+            headers = {"consumerkey": self.consumer_key}
 
             # Make API call for GET request
             response_open = self.session.get(url, header_auth=True, params=params_open, headers=headers)
@@ -565,7 +573,7 @@ class Order:
                         url = self.base_url + "/v1/accounts/" + self.account["accountIdKey"] + "/orders/cancel.json"
 
                         # Add parameters and header information
-                        headers = {"Content-Type": "application/xml", "consumerKey": config["DEFAULT"]["CONSUMER_KEY"]}
+                        headers = {"Content-Type": "application/xml", "consumerKey": self.consumer_key}
 
                         # Add payload for POST Request
                         payload = """<CancelOrderRequest>
@@ -645,7 +653,7 @@ class Order:
             url = self.base_url + "/v1/accounts/" + self.account["accountIdKey"] + "/orders.json"
 
             # Add parameters and header information
-            headers = {"consumerkey": config["DEFAULT"]["CONSUMER_KEY"]}
+            headers = {"consumerkey": self.consumer_key}
             params_open = {"status": "OPEN"}
             params_executed = {"status": "EXECUTED"}
             params_indiv_fills = {"status": "INDIVIDUAL_FILLS"}

@@ -5,7 +5,7 @@ This project provides both an interactive Command Line Interface (CLI) applicati
 ## Architecture
 
 - **Entry Points:**
-    - `etrade_python_client.py`: Handles the main CLI execution flow, including the OAuth 1.0 authentication process and the top-level main menu.
+    - `etrade_client.py`: Handles the main CLI execution flow, including the OAuth 1.0 authentication process and the top-level main menu.
     - `etrade_mcp_server.py`: Implements an MCP server using `fastmcp` to expose E*TRADE functionality to LLM clients like Claude Desktop.
 - **Modules:**
     - `accounts/`: Contains the `Accounts` class for listing accounts, viewing portfolios, and checking balances.
@@ -52,7 +52,7 @@ The `etrade_mcp_server.py` exposes the following tools to LLM clients:
 #### CLI Application
 Run the application from the `etrade_python_client/` directory:
 ```bash
-python etrade_python_client.py
+python etrade_client.py
 ```
 Follow the on-screen prompts to authenticate via the browser. This will generate `tokens.json`.
 
@@ -78,7 +78,7 @@ Refer to `README_MCP.md` for details on connecting with Claude Desktop or using 
     - Each major feature set (Accounts, Market, Order) is encapsulated in its own directory and class.
     - Modules are shared between the CLI and the MCP server.
 - **Authentication:**
-    - The `get_session` function in `etrade_python_client.py` handles token persistence.
+    - The `get_session` function in `etrade_client.py` handles token persistence.
     - It first tries to load tokens from `tokens.json`. If missing or expired, it initiates the OAuth web flow.
 - **Logging:**
     - The application uses `logging.handlers.RotatingFileHandler`.

@@ -14,7 +14,7 @@ def main():
         print("   Success! Base URL:", base_url)
     except Exception as e:
         print(f"   Failed: {e}")
-        print("   Please run 'python etrade_python_client.py' to authenticate first.")
+        print("   Please run 'python etrade_client.py' to authenticate first.")
         sys.exit(1)
 
     # Initialize Clients
