@@ -21,6 +21,16 @@ already have Python 3 installed, download it from
 
 3. E*TRADE consumer key and consumer secret.
 
+### Obtaining E*TRADE API Credentials
+
+To get your Consumer Key and Consumer Secret:
+
+1.  **E*TRADE Account:** You must have an existing E*TRADE account.
+2.  **Developer Portal:** Navigate to the [E*TRADE Developer website](https://developer.etrade.com/home).
+3.  **Log In:** Log in using your E*TRADE account credentials.
+4.  **Create Keys:** Look for an option to "Create Key" or "Get Sandbox Key." You will typically be provided with both Sandbox and Live (Production) keys. For live keys, you might need to complete an API Developer Agreement and a User Intent Survey.
+5.  **Record Keys:** Carefully record your Consumer Key and Consumer Secret for both Sandbox and Production environments. These will be used in your `config.ini` file.
+
 
 ## Setup
 
