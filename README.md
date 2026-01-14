@@ -26,7 +26,7 @@ already have Python 3 installed, download it from
 
 1. Unzip python zip file
 
-2. Edit [`config.ini`](EtradePythonClient/etrade_python_client/config.ini)
+2. Edit [`config.ini`](etrade_client/config.ini)
 with your consumer key and consumer secret; copy these from your application's keys' section
 
 3. Create the virtual environment by running the Python's venv command; see the command syntax below
@@ -58,8 +58,8 @@ $ pip install -r requirements.txt
 6. Run the sample application
 
 ```
-$ cd etrade_python_client
-$ python3 etrade_python_client.py
+$ cd etrade_client
+$ python3 etrade_client.py
 ```
 
 ## Running Code
@@ -83,6 +83,6 @@ $ source venv/bin/activate
 2. Run the application
 
 ```
-$ cd etrade_python_client
-$ python3 etrade_python_client.py
+$ cd etrade_client
+$ python3 etrade_client.py
 ```

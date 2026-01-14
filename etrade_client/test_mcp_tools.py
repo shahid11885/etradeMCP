@@ -1,6 +1,6 @@
 import sys
 import json
-from etrade_python_client import get_session
+import etrade_client
 from accounts.accounts import Accounts
 from market.market import Market
 
@@ -10,7 +10,7 @@ def main():
     # 1. Authenticate
     try:
         print("1. Loading Session...")
-        session, base_url = get_session(headless=True)
+        session, base_url = etrade_client.get_session(headless=True)
         print("   Success! Base URL:", base_url)
     except Exception as e:
         print(f"   Failed: {e}")

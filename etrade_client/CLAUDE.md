@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ```bash
-# Activate virtual environment (from etrade_python_client directory)
+# Activate virtual environment (from etrade_client directory)
 source venv/bin/activate
 
 # Install dependencies
@@ -15,7 +15,7 @@ pip install -r ../requirements.txt
 python etrade_client.py
 ```
 
-Note: The application must be run from the `etrade_python_client/` directory since it reads `config.ini` using a relative path.
+Note: The application must be run from the `etrade_client/` directory since it reads `config.ini` using a relative path.
 
 ## Architecture
 
@@ -27,7 +27,7 @@ This is an interactive CLI application for the E*TRADE API with OAuth 1 authenti
 ### Module Structure
 
 ```
-etrade_python_client/
+etrade_client/
 ├── etrade_client.py   # OAuth flow and main menu
 ├── accounts/accounts.py      # Accounts class - list accounts, portfolio, balance
 ├── market/market.py          # Market class - stock quotes

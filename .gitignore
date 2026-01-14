@@ -15,5 +15,5 @@ __pycache__/
 # Config with secrets (use config.ini.example instead)
 config.ini
 
-etrade_python_client/Application
+etrade_client/Application
 

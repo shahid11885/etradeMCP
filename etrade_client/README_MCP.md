@@ -43,7 +43,7 @@ To use this server with Claude Desktop, add the following configuration to your 
     "etrade": {
       "command": "python",
       "args": [
-        "/absolute/path/to/etrade_python_client/etrade_mcp_server.py"
+        "/absolute/path/to/etrade_client/etrade_mcp_server.py"
       ]
     }
   }
@@ -84,7 +84,7 @@ By default, the server runs using standard I/O (STDIN/STDOUT). You can also run 
 
 ```bash
 # From the project root
-./venv/bin/fastmcp run etrade_python_client/etrade_mcp_server.py --transport sse
+./venv/bin/fastmcp run etrade_client/etrade_mcp_server.py --transport sse
 ```
 
 This will start the server on `http://127.0.0.1:8000`.
@@ -93,7 +93,7 @@ This will start the server on `http://127.0.0.1:8000`.
 You can specify a different host or port using the `--host` and `--port` flags:
 
 ```bash
-./venv/bin/fastmcp run etrade_python_client/etrade_mcp_server.py --transport sse --host 0.0.0.0 --port 8080
+./venv/bin/fastmcp run etrade_client/etrade_mcp_server.py --transport sse --host 0.0.0.0 --port 8080
 ```
 
 This is useful if you want to access the MCP server from remote clients or other applications that support SSE transport.

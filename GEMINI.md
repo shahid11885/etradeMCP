@@ -5,12 +5,12 @@ This project provides both an interactive Command Line Interface (CLI) applicati
 ## Architecture
 
 - **Entry Points:**
-    - `etrade_client.py`: Handles the main CLI execution flow, including the OAuth 1.0 authentication process and the top-level main menu.
-    - `etrade_mcp_server.py`: Implements an MCP server using `fastmcp` to expose E*TRADE functionality to LLM clients like Claude Desktop.
+    - `etrade_client/etrade_client.py`: Handles the main CLI execution flow, including the OAuth 1.0 authentication process and the top-level main menu.
+    - `etrade_client/etrade_mcp_server.py`: Implements an MCP server using `fastmcp` to expose E*TRADE functionality to LLM clients like Claude Desktop.
 - **Modules:**
-    - `accounts/`: Contains the `Accounts` class for listing accounts, viewing portfolios, and checking balances.
-    - `market/`: Contains the `Market` class for retrieving stock quotes, option chains, and expiration dates.
-    - `order/`: Contains the `Order` class for previewing, viewing, and canceling orders.
+    - `etrade_client/accounts/`: Contains the `Accounts` class for listing accounts, viewing portfolios, and checking balances.
+    - `etrade_client/market/`: Contains the `Market` class for retrieving stock quotes, option chains, and expiration dates.
+    - `etrade_client/order/`: Contains the `Order` class for previewing, viewing, and canceling orders.
 
 ## MCP Tools
 
@@ -35,14 +35,14 @@ The `etrade_mcp_server.py` exposes the following tools to LLM clients:
 1.  **Configuration:**
     Copy the example configuration file and update it with your credentials:
     ```bash
-    cp config.ini.example config.ini
+    cp etrade_client/config.ini.example etrade_client/config.ini
     ```
-    Edit `config.ini` and set your `CONSUMER_KEY` and `CONSUMER_SECRET`.
+    Edit `etrade_client/config.ini` and set your `CONSUMER_KEY` and `CONSUMER_SECRET`.
 
 2.  **Dependencies:**
     Install the required Python packages:
     ```bash
-    pip install -r ../requirements.txt
+    pip install -r requirements.txt
     pip install fastmcp
     ```
     *Dependencies include: `requests`, `rauth`, `fastmcp`*
@@ -50,23 +50,23 @@ The `etrade_mcp_server.py` exposes the following tools to LLM clients:
 ### Execution
 
 #### CLI Application
-Run the application from the `etrade_python_client/` directory:
+Run the application from the project's root directory:
 ```bash
-python etrade_client.py
+python etrade_client/etrade_client.py
 ```
-Follow the on-screen prompts to authenticate via the browser. This will generate `tokens.json`.
+Follow the on-screen prompts to authenticate via the browser. This will generate `etrade_client/tokens.json`.
 
 #### MCP Server
 Once `tokens.json` is generated, you can run the MCP server:
 ```bash
-python etrade_mcp_server.py
+python etrade_client/etrade_mcp_server.py
 ```
 To run the server over HTTP (SSE), use:
 ```bash
-./venv/bin/fastmcp run etrade_python_client/etrade_mcp_server.py --transport sse
+fastmcp run etrade_client/etrade_mcp_server.py --transport sse
 ```
 You can also specify a port with `--port <port_number>`.
-Refer to `README_MCP.md` for details on connecting with Claude Desktop or using the MCP Inspector.
+Refer to `etrade_client/README_MCP.md` for details on connecting with Claude Desktop or using the MCP Inspector.
 
 ## Development Conventions
 
@@ -75,13 +75,13 @@ Refer to `README_MCP.md` for details on connecting with Claude Desktop or using 
     - Endpoints are constructed using the base URL (Sandbox or Prod) defined in `config.ini`.
     - Responses are typically JSON, parsed and displayed to the user via the CLI or returned as tool outputs in the MCP server.
 - **Project Structure:**
-    - Each major feature set (Accounts, Market, Order) is encapsulated in its own directory and class.
+    - Each major feature set (Accounts, Market, Order) is encapsulated in its own directory and class within `etrade_client`.
     - Modules are shared between the CLI and the MCP server.
 - **Authentication:**
     - The `get_session` function in `etrade_client.py` handles token persistence.
-    - It first tries to load tokens from `tokens.json`. If missing or expired, it initiates the OAuth web flow.
+    - It first tries to load tokens from `etrade_client/tokens.json`. If missing or expired, it initiates the OAuth web flow.
 - **Logging:**
     - The application uses `logging.handlers.RotatingFileHandler`.
-    - Logs are written to `python_client.log` (max 5MB, 3 backups).
+    - Logs are written to `python_client.log`.
 - **Error Handling:**
     - API errors are caught, and the JSON error message is parsed and displayed to the console or raised as an exception.
