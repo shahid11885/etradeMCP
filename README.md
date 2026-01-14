@@ -26,16 +26,23 @@ already have Python 3 installed, download it from
 
 1. Unzip python zip file
 
-2. Edit [`config.ini`](src/etrade_core/config.ini)
-with your consumer key and consumer secret; copy these from your application's keys' section
+2. Copy the example configuration file `config/config.ini.example` to `config/config.ini`.
 
-3. Create the virtual environment by running the Python's venv command; see the command syntax below
+   ```bash
+   cp config/config.ini.example config/config.ini
+   ```
+
+3. Edit `config.ini` with your consumer key and consumer secret.
+
+   **Note:** The application is designed to be flexible. If you only plan to use the production environment, you only need to provide the production keys. If you only use the sandbox, you only need the sandbox keys.
+
+4. Create the virtual environment by running the Python's venv command; see the command syntax below
 
 ```
 $ python3 -m venv venv
 ```
 
-4. Activate the Python virtual environment
+5. Activate the Python virtual environment
 
 On Windows, run:
 
@@ -49,7 +56,7 @@ On Unix or Mac OS, run:
 $ source venv/bin/activate
 ```
 
-5. Use pip to install dependencies for the sample application
+6. Use pip to install dependencies for the sample application
 
 ```
 $ pip install -r requirements.txt

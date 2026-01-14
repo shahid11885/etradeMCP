@@ -10,12 +10,11 @@ from rauth import OAuth1Service
 from .client_logger import logger
 
 # loading configuration file
-# The config and token files are expected to be in the same directory as this module.
-BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-config      = configparser.ConfigParser()
-config.read(os.path.join(BASE_DIR, 'config.ini'))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+config = configparser.ConfigParser()
+config.read(os.path.join(project_root, 'config', 'config.ini'))
 
-TOKEN_FILE = os.path.join(BASE_DIR, 'tokens.json')
+TOKEN_FILE = os.path.join(project_root, 'config', 'tokens.json')
 
 def get_etrade_service(env="PROD"):
     """Initializes and returns the OAuth1Service"""
@@ -72,7 +71,7 @@ def get_session(headless=False):
     tokens = load_tokens()
 
     if tokens:
-        if tokens["base_url"] == config["DEFAULT"]["SANDBOX_BASE_URL"]:
+        if "apisb.etrade.com" in tokens["base_url"]:
             env = "SANDBOX"
         else:
             env = "PROD"
@@ -86,7 +85,7 @@ def get_session(headless=False):
         raise Exception("No saved tokens found. Please run the CLI application first to authenticate.")
 
     # Interactive Auth Flow
-    menu_items = {"1": "Sandbox Consumer Key", "2": "Prod Consumer Key", "3": "Exit"}
+    menu_items = {"1": "Sandbox Environment", "2": "Production Environment", "3": "Exit"}
     while True:
         print("")
         options = list(menu_items.keys())

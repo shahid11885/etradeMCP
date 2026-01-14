@@ -12,7 +12,11 @@ The project is structured into three main components, all located under the `src
     - `market/`: Handles market data, quotes, and option chains.
     - `order/`: Manages order creation and tracking.
     - `client_logger.py`: Provides a shared logger.
+
+- **`config/`**: Contains configuration files.
     - `config.ini.example`: The template for API credentials.
+    - `config.ini`: Your actual API credentials (ignored by git).
+    - `tokens.json`: Stores authentication tokens (ignored by git).
 
 - **`cli/`**: The interactive command-line application.
     - `main.py`: The entry point for the CLI, which imports from `etrade_core`.
@@ -44,9 +48,11 @@ The `src/mcp/server.py` exposes the following tools to LLM clients:
 1.  **Configuration:**
     Copy the example configuration file and update it with your credentials:
     ```bash
-    cp src/etrade_core/config.ini.example src/etrade_core/config.ini
+    cp config/config.ini.example config/config.ini
     ```
-    Edit `src/etrade_core/config.ini` and set your `CONSUMER_KEY` and `CONSUMER_SECRET`.
+    Edit `config/config.ini` and set your `CONSUMER_KEY` and `CONSUMER_SECRET`.
+
+    **Note:** The application is designed to be flexible. If you only plan to use the production environment, you only need to provide the production keys (`PROD_CONSUMER_KEY`, `PROD_CONSUMER_SECRET`, `PROD_BASE_URL`). Similarly, if you only use the sandbox, you only need the sandbox keys. The application will intelligently use the keys provided and will not raise an error if one set of keys is missing.
 
 2.  **Dependencies:**
     Install the required Python packages:
@@ -58,7 +64,7 @@ The `src/mcp/server.py` exposes the following tools to LLM clients:
 
 ### Execution
 
-First, authenticate by running the CLI application. This will create a `tokens.json` file inside the `src/etrade_core` directory, which is needed by the MCP server.
+First, authenticate by running the CLI application. This will create a `config/tokens.json` file, which is needed by the MCP server.
 
 #### CLI Application
 Run the application from the project's root directory:
@@ -67,7 +73,7 @@ python src/cli/main.py
 ```
 
 #### MCP Server
-Once `src/etrade_core/tokens.json` is generated, you can run the MCP server:
+Once `config/tokens.json` is generated, you can run the MCP server:
 ```bash
 python src/mcp/server.py
 ```
@@ -81,12 +87,12 @@ You can also specify a port with `--port <port_number>`.
 
 - **API Interaction:**
     - All API calls are authenticated using `rauth` sessions managed by `src/etrade_core/auth.py`.
-    - Endpoints are constructed using the base URL (Sandbox or Prod) defined in `src/etrade_core/config.ini`.
+    - Endpoints are constructed using the base URL (Sandbox or Prod) defined in `config/config.ini`.
 - **Project Structure:**
-    - The project is separated into a core library (`etrade_core`) and two entry-point applications (`cli` and `mcp`), all within the `src` directory. This promotes separation of concerns.
+    - The project is separated into a core library (`etrade_core`) and two entry-point applications (`cli` and `mcp`), all within the `src` directory. Configuration files are in the top-level `config` directory. This promotes separation of concerns.
 - **Authentication:**
     - The `get_session` function in `src/etrade_core/auth.py` handles token persistence.
-    - It first tries to load tokens from `src/etrade_core/tokens.json`. If missing or expired, it initiates the interactive OAuth web flow (when run from the CLI).
+    - It first tries to load tokens from `config/tokens.json`. If missing or expired, it initiates the interactive OAuth web flow (when run from the CLI).
 - **Logging:**
     - The application uses a shared logger defined in `src/etrade_core/client_logger.py`.
-    - Logs are written to `python_client.log`.
+    - Logs are written to `logs/python_client.log`.

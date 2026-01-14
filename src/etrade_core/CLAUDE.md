@@ -30,7 +30,13 @@ This directory contains all the core logic for interacting with the E*TRADE API.
 - **`accounts/accounts.py`**: Manages account listing, portfolio, and balance.
 - **`market/market.py`**: Handles market data and quotes.
 - **`order/order.py`**: Manages order creation and tracking.
+
+### Configuration: `config`
+
+This directory contains configuration files for the project.
+
 - **`config.ini`**: Stores API credentials and base URLs.
+- **`tokens.json`**: Stores authentication tokens.
 
 ### CLI Application: `src/cli`
 
@@ -48,3 +54,4 @@ All modules in `etrade_core` follow a similar pattern:
 
 ### Logging
 All API calls logged to `python_client.log` (rotating, 5MB max, 3 backups) at DEBUG level.
+

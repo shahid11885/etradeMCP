@@ -11,9 +11,8 @@ __pycache__/
 # Logs
 *.log
 *.html
+/logs/
 
 # Config with secrets (use config.ini.example instead)
 config.ini
-
-etrade_client/Application
-
+tokens.json

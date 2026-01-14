@@ -13,11 +13,12 @@ Ensure you have installed the dependencies and configured your credentials.
     ```
 
 2.  **Configure Credentials:**
-    Copy `config.ini.example` to `config.ini` in the `src/etrade_core` directory and edit it with your E*TRADE Consumer Key and Secret.
+    Copy `config/config.ini.example` to `config/config.ini` and edit it with your E*TRADE Consumer Key and Secret.
     ```bash
-    cp src/etrade_core/config.ini.example src/etrade_core/config.ini
-    nano src/etrade_core/config.ini
+    cp config/config.ini.example config/config.ini
+    nano config/config.ini
     ```
+    **Note:** The application is designed to be flexible. If you only plan to use the production environment, you only need to provide the production keys. If you only use the sandbox, you only need the sandbox keys.
 
 ## 2. Authentication (One-Time Setup)
 
@@ -29,7 +30,7 @@ python src/cli/main.py
 *   Follow the prompts to log in to E*TRADE.
 *   Copy the verification code from the browser.
 *   Once the menu appears, you can exit.
-*   Verify that a `tokens.json` file has been created in the `src/etrade_core` directory.
+*   Verify that a `tokens.json` file has been created in the `config` directory.
 
 ## 3. Connecting with Claude Desktop
 

@@ -1,14 +1,8 @@
 import json
 import logging
-import configparser
 import os
 from ..order.order import Order
 from ..client_logger import logger
-
-# loading configuration file
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-config = configparser.ConfigParser()
-config.read(os.path.join(BASE_DIR, 'config.ini'))
 
 
 class Accounts:
@@ -21,11 +15,10 @@ class Accounts:
         self.session = session
         self.account = {}
         self.base_url = base_url
-        if self.base_url == config["DEFAULT"]["SANDBOX_BASE_URL"]:
-            self.consumer_key = config["DEFAULT"]["SANDBOX_CONSUMER_KEY"]
+        self.consumer_key = session.service.consumer_key
+        if "apisb.etrade.com" in self.base_url:
             self.is_sandbox = True
         else:
-            self.consumer_key = config["DEFAULT"]["PROD_CONSUMER_KEY"]
             self.is_sandbox = False
 
     def fetch_account_list(self):
