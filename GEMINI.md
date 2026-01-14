@@ -77,6 +77,10 @@ If you only need to generate and save the authentication tokens without running 
 ```bash
 python src/cli/main.py generate-tokens
 ```
+Alternatively, you can use the provided script to generate tokens:
+```bash
+./etrade-auth.sh
+```
 This is useful for setting up the `tokens.json` file for other applications, like the MCP server.
 
 #### MCP Server
