@@ -21,6 +21,12 @@ class Accounts:
         self.session = session
         self.account = {}
         self.base_url = base_url
+        if self.base_url == config["DEFAULT"]["SANDBOX_BASE_URL"]:
+            self.consumer_key = config["DEFAULT"]["SANDBOX_CONSUMER_KEY"]
+            self.is_sandbox = True
+        else:
+            self.consumer_key = config["DEFAULT"]["PROD_CONSUMER_KEY"]
+            self.is_sandbox = False
 
     def fetch_account_list(self):
         """
@@ -150,12 +156,28 @@ class Accounts:
             print(f"Error: {e}")
 
     def fetch_balance(self, account_id_key, institution_type="BROKERAGE"):
+
         """
+
         Fetches the balance for a specific account.
+
         """
+
         url = self.base_url + "/v1/accounts/" + account_id_key + "/balance.json"
-        params = {"instType": institution_type, "realTimeNAV": "true"}
-        headers = {"consumerkey": config["DEFAULT"]["CONSUMER_KEY"]}
+
+        headers = {"consumerkey": self.consumer_key}
+
+    
+
+        if self.is_sandbox:
+
+            params = {"instType": institution_type}
+
+        else:
+
+            params = {"instType": institution_type, "realTimeNAV": "true"}
+
+    
 
         response = self.session.get(url, header_auth=True, params=params, headers=headers)
         logger.debug("Request url: %s", url)

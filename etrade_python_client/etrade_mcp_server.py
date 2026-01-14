@@ -115,4 +115,7 @@ def get_option_chains(symbol: str, expiry_year: int = None, expiry_month: int = 
     )
 
 if __name__ == "__main__":
-    mcp.run()
+   mcp.run()
+
+# if __name__ == "__main__":
+#     mcp.run(transport="http", host="127.0.0.1", port=8080)

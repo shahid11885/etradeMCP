@@ -61,6 +61,11 @@ Once `tokens.json` is generated, you can run the MCP server:
 ```bash
 python etrade_mcp_server.py
 ```
+To run the server over HTTP (SSE), use:
+```bash
+./venv/bin/fastmcp run etrade_python_client/etrade_mcp_server.py --transport sse
+```
+You can also specify a port with `--port <port_number>`.
 Refer to `README_MCP.md` for details on connecting with Claude Desktop or using the MCP Inspector.
 
 ## Development Conventions

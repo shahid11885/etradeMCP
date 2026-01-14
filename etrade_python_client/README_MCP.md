@@ -78,6 +78,26 @@ This script will:
 3.  Fetch the balance for the first account found.
 4.  Fetch a quote for "AAPL".
 
+## 6. Running over HTTP (SSE)
+
+By default, the server runs using standard I/O (STDIN/STDOUT). You can also run it as an HTTP server using Server-Sent Events (SSE) transport:
+
+```bash
+# From the project root
+./venv/bin/fastmcp run etrade_python_client/etrade_mcp_server.py --transport sse
+```
+
+This will start the server on `http://127.0.0.1:8000`.
+
+### Customizing Host and Port
+You can specify a different host or port using the `--host` and `--port` flags:
+
+```bash
+./venv/bin/fastmcp run etrade_python_client/etrade_mcp_server.py --transport sse --host 0.0.0.0 --port 8080
+```
+
+This is useful if you want to access the MCP server from remote clients or other applications that support SSE transport.
+
 ## Troubleshooting
 
 *   **"Authentication failed":** Delete `tokens.json` and run `python etrade_python_client.py` again.
