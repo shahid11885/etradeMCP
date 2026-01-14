@@ -22,6 +22,16 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Create logs directory if it doesn't exist
+if [ ! -d "logs" ]; then
+    echo "Creating 'logs' directory..."
+    mkdir logs
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to create 'logs' directory."
+        exit 1
+    fi
+fi
+
 echo ""
 echo "Environment setup complete."
 echo "To activate the virtual environment, run:"

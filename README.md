@@ -1,4 +1,4 @@
-# E*TRADE API Python Sample Application
+# E*TRADE API Sample Application and MCP Server
 
 This sample Python application provides examples on using the ETRADE API endpoints.
 
@@ -34,7 +34,7 @@ To get your Consumer Key and Consumer Secret:
 
 ## Setup
 
-1. Unzip python zip file
+1. Install python if you dont already have it
 
 2. Copy the example configuration file `config/config.ini.example` to `config/config.ini`.
 
@@ -61,36 +61,18 @@ To get your Consumer Key and Consumer Secret:
 
 ## Running Code
 
-Complete these steps to run the code for the sample application:
-
-1. Activate the Python virtual environment
-
-On Windows, run:
-
+To authorize and generate tokens, execute the `etrade-auth.sh` script:
+```bash
+./etrade-auth.sh
 ```
-$ venv\Scripts\activate.bat
-```
+**Important:** E*TRADE tokens expire daily. Please run this script each day before using the application to ensure a valid session.
 
-On Unix or Mac OS, run:
-
+After authorization, you can run the CLI application (for Advanced users) or the MCP server as needed.
+For the CLI application:
+```bash
+python src/cli/main.py
 ```
-$ source venv/bin/activate
-```
-
-2. Run the CLI application to start the interactive menu:
-
-```
-$ python src/cli/main.py
-```
-
-3. (Optional) To generate and save authentication tokens without the interactive menu, use:
-
-```
-$ python src/cli/main.py generate-tokens
-```
-
-4. Run the MCP server:
-
-```
-$ python src/mcp/server.py
+For the MCP server:
+```bash
+python src/mcp/server.py
 ```
