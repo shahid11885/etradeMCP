@@ -11,6 +11,7 @@ from .client_logger import logger
 
 # loading configuration file
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+config = configparser.ConfigParser()
 config_file_path = os.path.join(project_root, 'config', 'config.ini')
 if not os.path.exists(config_file_path):
     print("ERROR: Configuration file 'config.ini' not found.")
