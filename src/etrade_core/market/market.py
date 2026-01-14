@@ -1,6 +1,6 @@
 import json
 import logging
-from client_logger import logger
+from ..client_logger import logger
 
 class Market:
     def __init__(self, session, base_url):

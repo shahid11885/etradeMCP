@@ -1,9 +1,10 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name='EtradePythonClient',
     version='1.0',
-    packages=['etrade_client',],
+    package_dir={'': 'src'},
+    packages=find_packages(where='src'),
     long_description=open('README.md').read(),
 )
 

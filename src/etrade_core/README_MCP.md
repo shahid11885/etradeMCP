@@ -8,15 +8,15 @@ Ensure you have installed the dependencies and configured your credentials.
 
 1.  **Install Dependencies:**
     ```bash
-    pip install -r ../requirements.txt
+    pip install -r requirements.txt
     pip install fastmcp
     ```
 
 2.  **Configure Credentials:**
-    Copy `config.ini.example` to `config.ini` and edit it with your E*TRADE Consumer Key and Secret.
+    Copy `config.ini.example` to `config.ini` in the `src/etrade_core` directory and edit it with your E*TRADE Consumer Key and Secret.
     ```bash
-    cp config.ini.example config.ini
-    nano config.ini
+    cp src/etrade_core/config.ini.example src/etrade_core/config.ini
+    nano src/etrade_core/config.ini
     ```
 
 ## 2. Authentication (One-Time Setup)
@@ -24,12 +24,12 @@ Ensure you have installed the dependencies and configured your credentials.
 The MCP server uses saved tokens to authenticate. You must run the CLI application once to log in via the browser.
 
 ```bash
-python etrade_client.py
+python src/cli/main.py
 ```
 *   Follow the prompts to log in to E*TRADE.
 *   Copy the verification code from the browser.
-*   Once the menu appears, you can exit (Select option `3` or `5` depending on the menu).
-*   Verify that a `tokens.json` file has been created in the directory.
+*   Once the menu appears, you can exit.
+*   Verify that a `tokens.json` file has been created in the `src/etrade_core` directory.
 
 ## 3. Connecting with Claude Desktop
 
@@ -43,13 +43,13 @@ To use this server with Claude Desktop, add the following configuration to your 
     "etrade": {
       "command": "python",
       "args": [
-        "/absolute/path/to/etrade_client/etrade_mcp_server.py"
+        "/absolute/path/to/your/project/src/mcp/server.py"
       ]
     }
   }
 }
 ```
-*Replace `/absolute/path/to/...` with the actual full path to the `etrade_mcp_server.py` file.*
+*Replace `/absolute/path/to/your/project` with the actual full path to this project's root directory.*
 
 ## 4. Testing with the MCP Inspector
 
@@ -57,7 +57,7 @@ You can inspect and test the server tools using the generic MCP inspector.
 
 1.  **Install the Inspector:**
     ```bash
-    npx @modelcontextprotocol/inspector python etrade_mcp_server.py
+    npx @modelcontextprotocol/inspector python src/mcp/server.py
     ```
     *(Requires Node.js and npm installed)*
 
@@ -66,10 +66,10 @@ You can inspect and test the server tools using the generic MCP inspector.
 
 ## 5. Testing with a Python Script
 
-You can also verify the server functionality using the provided test script `test_mcp_tools.py`.
+You can also verify the server functionality using the provided test script.
 
 ```bash
-python test_mcp_tools.py
+python src/mcp/test_tools.py
 ```
 
 This script will:
@@ -84,7 +84,7 @@ By default, the server runs using standard I/O (STDIN/STDOUT). You can also run 
 
 ```bash
 # From the project root
-./venv/bin/fastmcp run etrade_client/etrade_mcp_server.py --transport sse
+fastmcp run src/mcp/server.py --transport sse
 ```
 
 This will start the server on `http://127.0.0.1:8000`.
@@ -93,12 +93,12 @@ This will start the server on `http://127.0.0.1:8000`.
 You can specify a different host or port using the `--host` and `--port` flags:
 
 ```bash
-./venv/bin/fastmcp run etrade_client/etrade_mcp_server.py --transport sse --host 0.0.0.0 --port 8080
+fastmcp run src/mcp/server.py --transport sse --host 0.0.0.0 --port 8080
 ```
 
 This is useful if you want to access the MCP server from remote clients or other applications that support SSE transport.
 
 ## Troubleshooting
 
-*   **"Authentication failed":** Delete `tokens.json` and run `python etrade_client.py` again.
+*   **"Authentication failed":** Delete `src/etrade_core/tokens.json` and run `python src/cli/main.py` again.
 *   **"No module named 'fastmcp'":** Ensure you are in the correct virtual environment.

@@ -1,8 +1,14 @@
 import sys
+import os
 import json
-import etrade_client
-from accounts.accounts import Accounts
-from market.market import Market
+
+# Add project root to sys.path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
+
+from etrade_core import auth
+from etrade_core.accounts.accounts import Accounts
+from etrade_core.market.market import Market
 
 def main():
     print("--- E*TRADE Tool Test Script ---")
@@ -10,11 +16,11 @@ def main():
     # 1. Authenticate
     try:
         print("1. Loading Session...")
-        session, base_url = etrade_client.get_session(headless=True)
+        session, base_url = auth.get_session(headless=True)
         print("   Success! Base URL:", base_url)
     except Exception as e:
         print(f"   Failed: {e}")
-        print("   Please run 'python etrade_client.py' to authenticate first.")
+        print("   Please run 'python cli/main.py' to authenticate first.")
         sys.exit(1)
 
     # Initialize Clients

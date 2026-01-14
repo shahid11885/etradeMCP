@@ -4,7 +4,7 @@ import configparser
 import random
 import re
 import os
-from client_logger import logger
+from ..client_logger import logger
 
 # loading configuration file
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

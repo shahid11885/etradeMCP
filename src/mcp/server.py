@@ -1,7 +1,14 @@
+import sys
+import os
 from fastmcp import FastMCP
-from etrade_client import get_session
-from accounts.accounts import Accounts
-from market.market import Market
+
+# Add project root to sys.path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
+
+from etrade_core.auth import get_session
+from etrade_core.accounts.accounts import Accounts
+from etrade_core.market.market import Market
 
 # Initialize FastMCP server
 mcp = FastMCP("E*TRADE")

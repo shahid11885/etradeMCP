@@ -4,17 +4,26 @@ This project provides both an interactive Command Line Interface (CLI) applicati
 
 ## Architecture
 
-- **Entry Points:**
-    - `etrade_client/etrade_client.py`: Handles the main CLI execution flow, including the OAuth 1.0 authentication process and the top-level main menu.
-    - `etrade_client/etrade_mcp_server.py`: Implements an MCP server using `fastmcp` to expose E*TRADE functionality to LLM clients like Claude Desktop.
-- **Modules:**
-    - `etrade_client/accounts/`: Contains the `Accounts` class for listing accounts, viewing portfolios, and checking balances.
-    - `etrade_client/market/`: Contains the `Market` class for retrieving stock quotes, option chains, and expiration dates.
-    - `etrade_client/order/`: Contains the `Order` class for previewing, viewing, and canceling orders.
+The project is structured into three main components, all located under the `src/` directory:
+
+- **`etrade_core/`**: A library containing all the core logic for interacting with the E*TRADE API.
+    - `auth.py`: Handles OAuth 1.0 authentication and session management.
+    - `accounts/`: Manages account listing, portfolio, and balance.
+    - `market/`: Handles market data, quotes, and option chains.
+    - `order/`: Manages order creation and tracking.
+    - `client_logger.py`: Provides a shared logger.
+    - `config.ini.example`: The template for API credentials.
+
+- **`cli/`**: The interactive command-line application.
+    - `main.py`: The entry point for the CLI, which imports from `etrade_core`.
+
+- **`mcp/`**: The Model Context Protocol (MCP) server.
+    - `server.py`: The entry point for the MCP server, exposing tools from `etrade_core`.
+    - `test_tools.py`: A script to test the MCP tools.
 
 ## MCP Tools
 
-The `etrade_mcp_server.py` exposes the following tools to LLM clients:
+The `src/mcp/server.py` exposes the following tools to LLM clients:
 
 - `list_accounts()`: List all available brokerage accounts.
 - `get_portfolio(account_id_key)`: Get portfolio positions for a specific account.
@@ -35,9 +44,9 @@ The `etrade_mcp_server.py` exposes the following tools to LLM clients:
 1.  **Configuration:**
     Copy the example configuration file and update it with your credentials:
     ```bash
-    cp etrade_client/config.ini.example etrade_client/config.ini
+    cp src/etrade_core/config.ini.example src/etrade_core/config.ini
     ```
-    Edit `etrade_client/config.ini` and set your `CONSUMER_KEY` and `CONSUMER_SECRET`.
+    Edit `src/etrade_core/config.ini` and set your `CONSUMER_KEY` and `CONSUMER_SECRET`.
 
 2.  **Dependencies:**
     Install the required Python packages:
@@ -49,39 +58,35 @@ The `etrade_mcp_server.py` exposes the following tools to LLM clients:
 
 ### Execution
 
+First, authenticate by running the CLI application. This will create a `tokens.json` file inside the `src/etrade_core` directory, which is needed by the MCP server.
+
 #### CLI Application
 Run the application from the project's root directory:
 ```bash
-python etrade_client/etrade_client.py
+python src/cli/main.py
 ```
-Follow the on-screen prompts to authenticate via the browser. This will generate `etrade_client/tokens.json`.
 
 #### MCP Server
-Once `tokens.json` is generated, you can run the MCP server:
+Once `src/etrade_core/tokens.json` is generated, you can run the MCP server:
 ```bash
-python etrade_client/etrade_mcp_server.py
+python src/mcp/server.py
 ```
 To run the server over HTTP (SSE), use:
 ```bash
-fastmcp run etrade_client/etrade_mcp_server.py --transport sse
+fastmcp run src/mcp/server.py --transport sse
 ```
 You can also specify a port with `--port <port_number>`.
-Refer to `etrade_client/README_MCP.md` for details on connecting with Claude Desktop or using the MCP Inspector.
 
 ## Development Conventions
 
 - **API Interaction:**
-    - All API calls are authenticated using `rauth` sessions.
-    - Endpoints are constructed using the base URL (Sandbox or Prod) defined in `config.ini`.
-    - Responses are typically JSON, parsed and displayed to the user via the CLI or returned as tool outputs in the MCP server.
+    - All API calls are authenticated using `rauth` sessions managed by `src/etrade_core/auth.py`.
+    - Endpoints are constructed using the base URL (Sandbox or Prod) defined in `src/etrade_core/config.ini`.
 - **Project Structure:**
-    - Each major feature set (Accounts, Market, Order) is encapsulated in its own directory and class within `etrade_client`.
-    - Modules are shared between the CLI and the MCP server.
+    - The project is separated into a core library (`etrade_core`) and two entry-point applications (`cli` and `mcp`), all within the `src` directory. This promotes separation of concerns.
 - **Authentication:**
-    - The `get_session` function in `etrade_client.py` handles token persistence.
-    - It first tries to load tokens from `etrade_client/tokens.json`. If missing or expired, it initiates the OAuth web flow.
+    - The `get_session` function in `src/etrade_core/auth.py` handles token persistence.
+    - It first tries to load tokens from `src/etrade_core/tokens.json`. If missing or expired, it initiates the interactive OAuth web flow (when run from the CLI).
 - **Logging:**
-    - The application uses `logging.handlers.RotatingFileHandler`.
+    - The application uses a shared logger defined in `src/etrade_core/client_logger.py`.
     - Logs are written to `python_client.log`.
-- **Error Handling:**
-    - API errors are caught, and the JSON error message is parsed and displayed to the console or raised as an exception.

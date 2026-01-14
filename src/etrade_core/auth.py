@@ -1,25 +1,19 @@
-"""This Python script provides examples on using the E*TRADE API endpoints"""
+"This module handles E*TRADE API authentication."
 from __future__ import print_function
 import webbrowser
 import json
-import logging
 import configparser
 import sys
 import os
-import requests
-from rauth import OAuth1Service
 import datetime
-from client_logger import logger
-from accounts.accounts import Accounts
-from market.market import Market
+from rauth import OAuth1Service
+from .client_logger import logger
 
 # loading configuration file
+# The config and token files are expected to be in the same directory as this module.
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-config      = configparser.ConfigParser()  # noqa: E501
+config      = configparser.ConfigParser()
 config.read(os.path.join(BASE_DIR, 'config.ini'))
-
-# logger settings
-# (Managed by client_logger, which is imported)
 
 TOKEN_FILE = os.path.join(BASE_DIR, 'tokens.json')
 
@@ -35,12 +29,12 @@ def get_etrade_service(env="PROD"):
         base_url            = config["DEFAULT"]["SANDBOX_BASE_URL"]
 
     return OAuth1Service(
-        name                = "etrade",  # noqa: E501
+        name                = "etrade",
         consumer_key        = consumer_key,
         consumer_secret     = consumer_secret,
-        request_token_url   = f"{base_url}/oauth/request_token",   # noqa: E501
-        access_token_url    = f"{base_url}/oauth/access_token",    # noqa: E501
-        authorize_url       = "https://us.etrade.com/e/t/etws/authorize?key={}&token={}",  # noqa: E501
+        request_token_url   = f"{base_url}/oauth/request_token",
+        access_token_url    = f"{base_url}/oauth/access_token",
+        authorize_url       = "https://us.etrade.com/e/t/etws/authorize?key={}&token={}",
         base_url=base_url)
 
 def save_tokens(token, secret, base_url):
@@ -57,13 +51,8 @@ def save_tokens(token, secret, base_url):
 def load_tokens():
     """Loads the access token and secret from a file"""
     if os.path.exists(TOKEN_FILE):
-        # Get file modification time
         file_mtime = datetime.datetime.fromtimestamp(os.path.getmtime(TOKEN_FILE)).date()
-        
-        # Get current date
         current_date = datetime.date.today()
-        
-        # If token file is older than today, return None to force re-authentication
         if file_mtime < current_date:
             logger.info("Token file is older than today, forcing re-authentication.")
             return None
@@ -83,7 +72,6 @@ def get_session(headless=False):
     tokens = load_tokens()
 
     if tokens:
-        # Determine environment from saved base_url
         if tokens["base_url"] == config["DEFAULT"]["SANDBOX_BASE_URL"]:
             env = "SANDBOX"
         else:
@@ -98,20 +86,18 @@ def get_session(headless=False):
         raise Exception("No saved tokens found. Please run the CLI application first to authenticate.")
 
     # Interactive Auth Flow
-    menu_items = {"1": "Sandbox Consumer Key",
-                  "2": "Prod Consumer Key",
-                  "3": "Exit"}
+    menu_items = {"1": "Sandbox Consumer Key", "2": "Prod Consumer Key", "3": "Exit"}
     while True:
         print("")
-        options         = list(menu_items.keys())  # noqa: E501
+        options = list(menu_items.keys())
         for entry in options:
             print(entry + ")\t" + menu_items[entry])
-        selection       = input("Please select Consumer Key Type: ")  # noqa: E501
+        selection = input("Please select Consumer Key Type: ")
         if selection == "1":
-            env         = "SANDBOX"
+            env = "SANDBOX"
             break
         elif selection == "2":
-            env         = "PROD"  # noqa: E501
+            env = "PROD"
             break
         elif selection == "3":
             sys.exit(0)
@@ -122,68 +108,17 @@ def get_session(headless=False):
     etrade = get_etrade_service(env)
     base_url = etrade.base_url
 
-    # Step 1: Get OAuth 1 request token and secret
     request_token, request_token_secret = etrade.get_request_token(
         params={"oauth_callback": "oob", "format": "json"})
 
-    # Step 2: Go through the authentication flow. Login to E*TRADE.
     authorize_url = etrade.authorize_url.format(etrade.consumer_key, request_token)
     webbrowser.open(authorize_url)
     print("Please accept agreement and enter verification code from browser.")
     text_code = input("Verification Code: ")
 
-    # Step 3: Exchange the authorized request token for an authenticated OAuth 1 session
     session = etrade.get_auth_session(request_token,
                                   request_token_secret,
                                   params={"oauth_verifier": text_code})
 
     save_tokens(session.access_token, session.access_token_secret, base_url)
     return session, base_url
-
-def oauth():
-    """Allows user authorization for the sample application with OAuth 1"""
-    try:
-        session, base_url = get_session()
-        main_menu(session, base_url)
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-def main_menu(session, base_url):
-    """
-    Provides the different options for the sample application: Market Quotes, Option Expire Dates, Option Chains, Account List
-
-    :param session: authenticated session
-    """
-
-    menu_items = {"1": "Market Quotes",
-                  "2": "Option Expire Dates",
-                  "3": "Option Chains",
-                  "4": "Account List",
-                  "5": "Exit"}
-
-    while True:
-        print("")
-        options = menu_items.keys()
-        for entry in options:
-            print(entry + ")\t" + menu_items[entry])
-        selection = input("Please select an option: ")
-        if selection == "1":
-            market = Market(session, base_url)
-            market.quotes()
-        elif selection == "2":
-            market = Market(session, base_url)
-            market.option_expire_dates()
-        elif selection == "3":
-            market = Market(session, base_url)
-            market.option_chains()
-        elif selection == "4":
-            accounts = Accounts(session, base_url)
-            accounts.account_list()
-        elif selection == "5":
-            break
-        else:
-            print("Unknown Option Selected!")
-
-
-if __name__ == "__main__":
-    oauth()
