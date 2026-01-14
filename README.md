@@ -46,31 +46,18 @@ To get your Consumer Key and Consumer Secret:
 
    **Note:** The application is designed to be flexible. If you only plan to use the production environment, you only need to provide the production keys. If you only use the sandbox, you only need the sandbox keys.
 
-4. Create the virtual environment by running the Python's venv command; see the command syntax below
+4. Set up the Python environment by running the setup script:
 
-```
-$ python3 -m venv venv
-```
+   ```bash
+   ./setup_env.sh
+   ```
+   This will create a virtual environment and install the necessary dependencies.
 
-5. Activate the Python virtual environment
+5. Activate the Python virtual environment:
 
-On Windows, run:
-
-```
-$ venv\Scripts\activate.bat
-```
-
-On Unix or Mac OS, run:
-
-```
-$ source venv/bin/activate
-```
-
-6. Use pip to install dependencies for the sample application
-
-```
-$ pip install -r requirements.txt
-```
+   ```bash
+   source venv/bin/activate
+   ```
 
 ## Running Code
 
