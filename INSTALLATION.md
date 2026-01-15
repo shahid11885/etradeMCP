@@ -1,6 +1,4 @@
-This is a great initiative. Since you're targeting users who are "starting very fresh" and may not be tech-savvy, I have designed this `INSTALLATION.md` to be extremely visual, using clear emojis, step-by-step checkboxes, and plain-English explanations for technical terms.
 
-Below is the content for your file.
 
 ---
 
@@ -11,6 +9,7 @@ Welcome! This guide will help you connect your E*Trade account to AI tools like 
 ---
 
 ## 🛠 Prerequisites (Do these first!)
+0. Make sure you have some familiarity using the terminal
 
 1. **Get E*Trade API Keys:**
 * Go to [E*Trade Developer Portal](https://developer.etrade.com/home).
@@ -31,7 +30,7 @@ Open your **Terminal** (on Mac, press `Cmd + Space` and type "Terminal") and cop
 
 1. **Create a folder for the project:**
 ```bash
-mkdir $HOME/mcp
+mkdir -p $HOME/mcp
 cd $HOME/mcp
 
 ```
@@ -104,15 +103,23 @@ Open the file `$HOME/.gemini/settings.json` and paste this inside the `mcpServer
 ### For Claude Desktop Users
 
 Open the file `$HOME/Library/Application Support/Claude/claude_desktop_config.json` and paste this inside the `mcpServers` section:
+For example I am including mine. Replace my HOME dir **(/Users/shahid)** with yours.
 
 ```json
-"etrade": {
-  "command": "$HOME/mcp/etradeMCP/venv/bin/python",
-  "args": ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
-  "env": {
-    "PYTHONPATH": "$HOME/mcp/etradeMCP/"
+{
+  "mcpServers": {
+
+    "etrade" : {
+      "command": "/Users/shahid/mcp/etradeMCP/venv/bin/python",
+      "args":   ["/Users/shahid/mcp/etradeMCP/src/mcp/server.py"],
+      "env": {
+        "PYTHONPATH" : "/Users/shahid/mcp/etradeMCP/"
+      }
+    }
+
   }
 }
+
 
 ```
 
