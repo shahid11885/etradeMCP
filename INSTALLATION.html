@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Installation Guide: E*Trade MCP Server</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #003366;
+            --secondary: #007bff;
+            --accent: #6f42c1;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --bg: #f4f7f9;
+            --card: #ffffff;
+            --text: #2d3436;
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Hero Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 60px 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,51,102,0.2);
+        }
+
+        header h1 { margin: 0; font-size: 2.8rem; letter-spacing: -1px; }
+        header p { font-size: 1.2rem; opacity: 0.9; margin-top: 10px; }
+
+        /* Step Card */
+        .step-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 8px solid var(--secondary);
+            transition: transform 0.2s;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .step-number {
+            background: var(--secondary);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            margin-right: 20px;
+            box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+        }
+
+        .step-header h2 { margin: 0; font-size: 1.8rem; color: var(--primary); }
+
+        /* Code Blocks */
+        .code-container {
+            position: relative;
+            background: var(--code-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        pre {
+            margin: 0;
+            color: #dcdcdc;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Tables */
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .config-table th, .config-table td {
+            padding: 15px;
+            border: 1px solid #eee;
+            text-align: left;
+        }
+
+        .config-table th { background: #f8f9fa; color: var(--primary); }
+
+        /* Badges & Notes */
+        .badge {
+            background: #e1f5fe;
+            color: #0288d1;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .tip-box {
+            background: #fff9db;
+            border-left: 5px solid #fab005;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .tip-box i { margin-right: 15px; font-size: 1.5rem; color: #fab005; }
+
+        .path-label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .step-header h2 { font-size: 1.4rem; }
+            .step-card { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1><i class="fas fa-university"></i> E*Trade MCP Installation</h1>
+        <p>Complete Exhaustive Setup Guide • Version 1.0 (2026)</p>
+    </header>
+
+    <div class="step-card">
+        <div class="step-header">
+            <div class="step-number">1</div>
+            <h2>Download & Prepare Code</h2>
+        </div>
+        <p>First, we create a dedicated workspace and clone the repository. Ensure you have the <strong>GitHub CLI (gh)</strong> installed.</p>
+        
+        <div class="code-container">
+            <button class="copy-btn" onclick="copyText('code1')">Copy</button>
+            <pre id="code1">
+# Create directory
+mkdir $HOME/mcp
+cd $HOME/mcp
+
+# Clone the repository
+gh repo clone shahid11885/etradeMCP
+            </pre>
+        </div>
+    </div>
+
+    <div class="step-card" style="border-left-color: var(--accent);">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <h2>Fetch E*Trade API Keys</h2>
+        </div>
+        <p>Visit the <a href="https://developer.etrade.com/home" target="_blank">E*Trade Developer Portal</a> to obtain your production keys.</p>
+        
+        <div class="tip-box">
+            <i class="fas fa-file-signature"></i>
+            <div>
+                <strong>Configuration Mapping:</strong><br>
+                Locate <code>config/config.ini.example</code> in the downloaded folder.<br>
+                Rename it to <strong><code>config.ini</code></strong> and paste your Consumer Key and Secret.
+            </div>
+        </div>
+    </div>
+
+    <div class="step-card" style="border-left-color: var(--success);">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <h2>Execute System Scripts</h2>
+        </div>
+        <p>Run these scripts to build the virtual environment and link your account.</p>
+        
+        <div class="code-container">
+            <button class="copy-btn" onclick="copyText('code2')">Copy</button>
+            <pre id="code2">
+cd $HOME/mcp/etradeMCP
+
+# 1. Prepare environment (Run once)
+./setup_env.sh
+
+# 2. Authenticate (Run daily)
+./etrade-auth.sh
+            </pre>
+        </div>
+        <p><span class="badge">SECURITY NOTE</span> <code>etrade-auth.sh</code> is required at least once a day as E*Trade tokens expire regularly.</p>
+    </div>
+
+    <div class="step-card" style="border-left-color: var(--info);">
+        <div class="step-header">
+            <div class="step-number">4</div>
+            <h2>Configure Gemini & Claude</h2>
+        </div>
+        <p>Tell your AI models where the E*Trade "brain" is located.</p>
+
+        <span class="path-label">GEMINI SETTINGS: $HOME/.gemini/settings.json</span>
+        <div class="code-container">
+            <button class="copy-btn" onclick="copyText('code3')">Copy</button>
+            <pre id="code3">
+"mcpServers": {
+  "etrade": {
+    "command": "$HOME/mcp/etradeMCP/venv/bin/python",
+    "args": ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
+    "env": { "PYTHONPATH": "$HOME/mcp/etradeMCP/" }
+  }
+}
+            </pre>
+        </div>
+
+        <span class="path-label">CLAUDE SETTINGS: $HOME/Library/Application Support/Claude/claude_desktop_config.json</span>
+        <div class="code-container">
+            <button class="copy-btn" onclick="copyText('code4')">Copy</button>
+            <pre id="code4">
+"mcpServers": {
+  "etrade": {
+    "command": "$HOME/mcp/etradeMCP/venv/bin/python",
+    "args": ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
+    "env": { "PYTHONPATH": "$HOME/mcp/etradeMCP/" }
+  }
+}
+            </pre>
+        </div>
+    </div>
+
+    <div class="step-card" style="border-left-color: var(--warning); background-color: #fffdf5;">
+        <div class="step-header">
+            <div class="step-number">5</div>
+            <h2>Test & Launch Portfolio Analysis</h2>
+        </div>
+        <p>Restart your AI app and paste the <strong>Master Trust Analysis Prompt</strong> below to get your full report.</p>
+
+        <div class="code-container" style="background: #ffffff; border: 1px solid #ddd;">
+            <button class="copy-btn" style="background: var(--primary);" onclick="copyText('code5')">Copy Master Prompt</button>
+            <pre id="code5" style="color: #333; font-family: sans-serif; white-space: pre-wrap;">
+Analyze the Trust portfolio for:
+1. Deep risk/exposure analysis (factor, sector, beta, concentration).
+2. Downside risk management / hedging recommendations (QQQ).
+3. A low-assignment-risk covered call program.
+
+Assumptions: Growth over income, minimize sales/taxes, no liquidity needs for 12 months.
+            </pre>
+        </div>
+    </div>
+
+    <div class="step-card" style="border-left: none; background: #f1f3f5;">
+        <h3><i class="fas fa-bug"></i> Troubleshooting FAQ</h3>
+        <table class="config-table">
+            <tr>
+                <th>Issue</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td><strong>Module Not Found</strong></td>
+                <td>Run <code>./setup_env.sh</code> again to ensure the virtual environment (venv) is built correctly.</td>
+            </tr>
+            <tr>
+                <td><strong>Token Expired</strong></td>
+                <td>Run <code>./etrade-auth.sh</code>. You must do this every 24 hours.</td>
+            </tr>
+            <tr>
+                <td><strong>AI No Response</strong></td>
+                <td>Ensure the path in <code>settings.json</code> matches your actual $HOME path (e.g., <code>/Users/name/mcp...</code>).</td>
+            </tr>
+        </table>
+    </div>
+
+    <footer style="text-align: center; margin-top: 50px; color: #999;">
+        <p>© 2026 E*Trade MCP Infrastructure • Designed for High-Net-Worth Portfolio Management</p>
+    </footer>
+</div>
+
+<script>
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Copied to clipboard!");
+        });
+    }
+</script>
+
+</body>
+</html>
