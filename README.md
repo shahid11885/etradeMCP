@@ -243,14 +243,20 @@ Configure your AI client to start the MCP server as a local process.
 
 ### For Gemini Users
 
-Open the file `$HOME/.gemini/settings.json` and paste this inside the `mcpServers` section:
+Open the file `$HOME/.gemini/settings.json` and copy this section:
 
 ```json
-"etrade": {
-  "command": "$HOME/mcp/etradeMCP/venv/bin/python",
-  "args": ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
-  "env": {
-    "PYTHONPATH": "$HOME/mcp/etradeMCP/"
+{
+  "mcpServers": {
+
+    "etrade" : {
+      "command": "$HOME/mcp/etradeMCP/venv/bin/python",
+      "args":   ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
+      "env": {
+        "PYTHONPATH" : "/Users/shahid/mcp/etradeMCP/"
+      }
+    }
+
   }
 }
 
@@ -258,8 +264,9 @@ Open the file `$HOME/.gemini/settings.json` and paste this inside the `mcpServer
 
 ### For Claude Desktop Users
 
-Open the file `$HOME/Library/Application Support/Claude/claude_desktop_config.json` and paste this inside the `mcpServers` section:
+Open the file `$HOME/Library/Application Support/Claude/claude_desktop_config.json` and copy this section:
 Example configuration is shown below. Replace the home directory path (for example, `/Users/shahid`) with your own.
+Unfortunately, you cannot use $HOME here. It didnt work for me.
 
 ```json
 {

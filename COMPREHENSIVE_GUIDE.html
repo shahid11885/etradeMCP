@@ -569,24 +569,31 @@ cd $HOME/mcp</code></pre>
             <div class="config-section">
                 <h4>For Gemini Users</h4>
 
-                <p>Open the file <code>$HOME/.gemini/settings.json</code> and paste this inside the <code>mcpServers</code> section:</p>
+                <p>Open the file <code>$HOME/.gemini/settings.json</code> and copy this section:</p>
 
-                <pre><code>"etrade": {
-  "command": "$HOME/mcp/etradeMCP/venv/bin/python",
-  "args": ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
-  "env": {
-    "PYTHONPATH": "$HOME/mcp/etradeMCP/"
+                <pre><code>{
+  "mcpServers": {
+
+    "etrade" : {
+      "command": "$HOME/mcp/etradeMCP/venv/bin/python",
+      "args":   ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
+      "env": {
+        "PYTHONPATH" : "$HOME/mcp/etradeMCP/"
+      }
+    }
+
   }
-}</code></pre>
+}
+                </code></pre>
             </div>
 
             <div class="config-section">
                 <h4>For Claude Desktop Users</h4>
 
-                <p>Open the file <code>$HOME/Library/Application Support/Claude/claude_desktop_config.json</code> and paste this inside the <code>mcpServers</code> section:</p>
+                <p>Open the file <code>$HOME/Library/Application Support/Claude/claude_desktop_config.json</code> and copy this section:</p>
                 
                 <p>Example configuration is shown below. Replace the home directory path (for example, <code>/Users/shahid</code>) with your own.</p>
-
+                <p> Unfortunately, you cannot use $HOME here. It didnt work for me. </p>
                 <pre><code>{
   "mcpServers": {
 
