@@ -1,78 +1,290 @@
-# E*TRADE API Sample Application and MCP Server
+# E*TRADE MCP Server: Comprehensive Guide
 
-This sample Python application provides examples on using the ETRADE API endpoints.
+This guide provides a complete overview of the E*TRADE MCP Server, from installation to advanced usage. It will walk you through connecting your E*TRADE account to AI tools like **Claude** or **Gemini**, and then explain how to leverage this connection for powerful, real-time financial analysis.
 
-## Table of Contents
+---
 
-* [Requirements](#requirements)
-* [Setup](#setup)
-* [Running Code](#running-code)
+# Part 1: Real-Time Brokerage Data for LLM-Based Financial Analysis
 
-## Requirements
+Large Language Models (LLMs) like ChatGPT, Gemini, and Claude have revolutionized how we interact with information. However, their incredible power has, until now, been severely limited when it comes to personal financial analysis. They are like a brilliant financial analyst locked in a room with no internet and no access to your personal files.
 
-In order to run this sample application you need the following three items:
+Standard chatbots face three practical limitations for personal financial analysis:
 
-1. Python 3 - this sample application is written in Python and requires Python 3. If you do not
-already have Python 3 installed, download it from
+1.  **Stale, Generic Knowledge:** LLMs are trained on vast but static datasets. Their knowledge of the market is a snapshot from the past, making them unaware of today's prices, news, or economic indicators. Financial markets are dynamic, and yesterday's information is often irrelevant.
+2.  **Lack of Real-Time Portfolio Access:** They are completely disconnected from your live brokerage accounts. They don't know what you own, your cost basis, how concentrated your positions are, or how your portfolio is performing *right now*.
+3.  **Inability to Take Action:** Without live data, they cannot perform concrete, actionable analysis. They can talk about financial strategies in theory, but they can't fetch a real-time option chain to find a specific contract, calculate a premium, or assess the risk of a trade based on live market conditions.
 
-   [`https://www.python.org/downloads/`](https://www.python.org/downloads/).
+This is where a **Model Context Protocol (MCP) server** becomes a game-changer. By acting as a secure bridge between the LLM and your brokerage account, an MCP server provides the live data needed for truly personalized and actionable financial insights. It gives the LLM "eyes and ears" into your financial world, transforming it from a generalist into a specialist.
 
-2. An [E*TRADE](https://us.etrade.com) account
+## The E*TRADE MCP Server: Your Personal Financial Analyst
 
-3. E*TRADE consumer key and consumer secret.
+This project provides an MCP server specifically designed to connect with the E*TRADE API. It empowers your LLM with the ability to:
 
-### Obtaining E*TRADE API Credentials
+*   **List your brokerage accounts.**
+*   **Fetch your real-time portfolio holdings.**
+*   **Get real-time quotes for stocks and options.**
+*   **Analyze option chains to identify opportunities.**
 
-To get your Consumer Key and Consumer Secret:
+This direct access bridges the gap between theoretical knowledge and practical application. An LLM can now go from a vague suggestion like "you could sell covered calls" to a precise, actionable insight like, "Based on your 1,000 shares of AAPL and current market prices, you could consider selling the October 85 call, which has a delta of 0.12 and is currently trading at a premium of .50."
 
-1.  **E*TRADE Account:** You must have an existing E*TRADE account.
-2.  **Developer Portal:** Navigate to the [E*TRADE Developer website](https://developer.etrade.com/home).
-3.  **Log In:** Log in using your E*TRADE account credentials.
-4.  **Create Keys:** Look for an option to "Create Key" or "Get Sandbox Key." You will typically be provided with both Sandbox and Live (Production) keys. For live keys, you might need to complete an API Developer Agreement and a User Intent Survey.
-5.  **Record Keys:** Carefully record your Consumer Key and Consumer Secret for both Sandbox and Production environments. These will be used in your `config.ini` file.
+This setup democratizes access to sophisticated financial analysis, putting tools once reserved for hedge funds and professional traders directly into the hands of individual investors.
+
+## A Powerful Use-Case: Deep Portfolio Analysis with a Sophisticated Prompt
+
+The true power of this approach is unlocked when you combine it with a detailed and sophisticated prompt. A well-crafted prompt can guide the LLM to perform a deep analysis of your portfolio, identify risks, and even suggest income-generating strategies.
+
+Here is an example of a prompt designed to analyze a portfolio, focusing on risk management and generating passive income through a low-risk covered call program:
+
+```
+
+You are my portfolio analyst. You have access to an MCP server called “ETrade” that can return real-time equity quotes, historical prices, and full option chains, and it can also retrieve my portfolio holdings for a specified brokerage account.
+If I have more than one brokerage account, list the available accounts and prompt me to select which one to analyze before fetching holdings.
+
+Objective
+
+Analyze the selected account portfolio for:
+1.Deep risk/exposure analysis (factor, sector, single-name, beta, concentration, correlation)
+2.Downside risk management / hedging recommendations (costed and sized)
+3.A low-assignment-risk covered call program to generate supplemental cashflow without materially compromising long-term growth
+
+Accounts in scope
+•Primary scope: the brokerage account I select (fetch holdings via ETrade MCP)
+•Optional: If I provide other account holdings manually, include them separately; do not blend tax assumptions across accounts.
+
+⸻
+
+Assumptions / constraints (must follow)
+1.Minimize risk of assignment on covered calls (prioritize low delta, liquidity, roll rules, and avoidance of earnings/dividend early-assignment risk).
+2.Growth is preferred over income (do not aggressively cap upside; premiums are secondary).
+3.Avoid sales whenever possible (some positions have very low cost basis; avoid realizing gains and avoid assignment that would trigger taxable sales).
+4.No liquidity events planned within the next 12 months (do not design around near-term cash needs).
+5.QQQ options are permitted for hedging and/or overlay strategies if appropriate.
+
+If any assumption conflicts with a recommended trade, explicitly call out the conflict and provide an alternative.
+
+⸻
+
+Required tool usage (ETrade MCP)
+1.Fetch portfolio holdings for the selected brokerage account via ETrade MCP (ticker, shares, average cost if available, market value if available).
+2.Pull current quotes for all tickers in the selected account.
+3.Pull 1y daily prices (or longest available) for volatility/correlation/beta estimates.
+4.Pull option chains for each eligible holding (at least next 3 monthly expirations), including bid/ask, IV, delta, open interest, and volume.
+5.Pull QQQ option chains as needed for hedging overlays.
+6.If any tool call fails or data is missing, explicitly state what’s missing and proceed with best-effort assumptions.
+
+⸻
+
+Deliverables (must be structured exactly as follows)
+
+1) Portfolio Snapshot (Selected Account)
+•Total market value (and cash, if available from ETrade)
+•Table by holding: ticker, shares, price, market value, % weight, 1y vol, beta vs SPY (estimate), dividend yield (if available)
+•Concentration stats: top 1, top 5, top 10; Herfindahl index; single-name risk callout
+
+2) Exposure Map
+•Sector allocation (standard classification; if inferred, label “inferred”)
+•Factor/style proxies: growth/value tilt, momentum proxy, quality proxy, duration sensitivity proxy
+•Correlation clusters: identify groups moving together; highlight hidden concentration and “same-trade” exposure (e.g., mega-cap tech overlap)
+
+3) Risk Diagnosis
+•Quantified risks where possible:
+•Market beta risk and drawdown sensitivity
+•Sector risk
+•Volatility risk
+•Liquidity/options-market quality risk (spreads, OI, volume)
+•Tail risk (gap risk, earnings risk)
+•Scenario analysis with assumptions:
+•-10% SPY, -20% SPY, rate shock, volatility spike
+•Flag holdings where covered calls are structurally unattractive for my goals (thin options, chronic gap risk, too much upside cap vs premium)
+
+4) Covered Call Program (low-assignment-risk, growth-first)
+
+Design a covered call approach that explicitly minimizes assignment and avoids realizing gains:
+•Eligibility rules:
+•Minimum liquidity thresholds (OI/volume/spread)
+•Avoid earnings windows and high early-assignment risk periods (dividends)
+•Strike selection rules that preserve upside (growth-first)
+•For each eligible holding, propose 2 candidates max (to reduce noise), focused on low assignment probability:
+•“Ultra-conservative” target delta ~0.08–0.15
+•“Conservative” target delta ~0.15–0.22
+For each candidate include:
+•Expiration, strike, delta, IV, mid premium, premium % of underlying, simple annualized yield, distance to strike (%), assignment risk assessment, liquidity notes (spread/OI/volume), and any earnings/dividend considerations
+•Recommended contracts (#) based on shares and concentration limits
+•A portfolio-level premium estimate range (monthly) and upside cap implications
+
+Management rules (must be explicit):
+•When to close early (e.g., 50–75% premium captured, or delta rises beyond threshold)
+•When/how to roll up and/or out to avoid assignment (defined triggers)
+•What to do if price approaches strike (priority = avoid assignment; define roll mechanics)
+•A “do-not-write” rule set when risk of forced sale is elevated
+
+5) Hedging Plan (QQQ permitted)
+
+Provide a hedging menu aligned to portfolio exposures and growth preference:
+•Prefer index-based hedges (QQQ and/or SPY) to avoid selling individual low-basis names
+•Candidate approaches (as applicable):
+•Put spreads / collars on QQQ
+•Crash protection overlays with defined annual budget (financed partially by call premiums if feasible without harming growth)
+•For each hedge: sizing method, candidate contracts with quotes, expected carry cost, and how it reduces drawdown under the scenarios in section 3
+
+6) Opportunities / Optimizations (non-sale-biased)
+•Identify risk reductions that do not require selling (hedges, overlays, diversification via new contributions if any, or reallocations only if explicitly permitted)
+•Identify holdings where options pricing is favorable without meaningfully capping upside
+•90-day execution plan with a weekly checklist (including earnings calendar checks, roll dates, monitoring metrics)
+
+7) Questions / Assumptions
+
+List the top 5 questions that would materially change recommendations (e.g., tax treatment specifics of the selected account, willingness to realize gains under any circumstance, margin permissions, option approval level), but still provide a complete first-pass plan using the assumptions above.
+
+⸻
+
+Important constraints
+•Do not provide generic education. Use the holdings fetched from ETrade for the selected account and real option/quote data.
+•Prioritize execution realism (liquidity, spreads, assignment mechanics).
+•Be explicit about risks: covered calls cap upside; hedges cost carry; and assignment can trigger unwanted taxable sales—avoid it per assumptions.
+•Keep outputs actionable: specific contracts, strikes, expirations, contract counts, and roll/close triggers.
+```
+
+### The Prompt Explained
+
+This prompt is a detailed set of instructions for the LLM, now supercharged with the E*TRADE MCP server. It tells the model to:
+
+*   **Analyze the user's holdings** in terms of risk profile and biases.
+*   **Suggest a passive income strategy** by selling specific covered calls with a low risk of assignment.
+*   **Fetch the appropriate option chains** for the user's holdings to identify the exact covered calls to sell.
+*   **Analyze existing call positions** and recommend whether to hold, close, or roll them.
+*   **Suggest hedging strategies**, such as buying PUTs, to mitigate downside risk if the portfolio is overexposed.
+
+---
+---
+
+# Part 2: Installation
+
+This section explains how to connect your E*TRADE account to your AI assistant. Once configured, you can ask questions such as "Show my portfolio" or "Analyze my brokerage account risk."
+
+---
+
+## Prerequisites
+**Requirements:**
+
+- Familiarity with basic terminal usage
+
+**E*TRADE developer credentials**
+
+1. **Get E*TRADE API keys:**
+* Go to [E*TRADE Developer Portal](https://developer.etrade.com/home).
+* Follow their steps to get your **Consumer Key** and **Consumer Secret**.
+* These credentials are used by the MCP server to authenticate with E*TRADE.
 
 
-## Setup
+**Source control tooling**
 
-1. Install python if you dont already have it
+2. **Install GitHub CLI (`gh`):**
+* If you don't have it, download it [here](https://cli.github.com/). This tool lets you download the code easily.
 
-2. Copy the example configuration file `config/config.ini.example` to `config/config.ini`.
+---
 
-   ```bash
-   cp config/config.ini.example config/config.ini
-   ```
+## Step 1: Download the code
 
-3. Edit `config.ini` with your consumer key and consumer secret.
+Open your **Terminal** (on Mac, press `Cmd + Space` and type "Terminal") and copy-paste these lines one by one:
 
-   **Note:** The application is designed to be flexible. If you only plan to use the production environment, you only need to provide the production keys. If you only use the sandbox, you only need the sandbox keys.
+1. **Create a folder for the project:**
+```bash
+mkdir -p $HOME/mcp
+cd $HOME/mcp
 
-4. Set up the Python environment by running the setup script:
+```
 
-   ```bash
-   ./setup_env.sh
-   ```
-   This will create a virtual environment and install the necessary dependencies.
 
-5. Activate the Python virtual environment:
+2. **Download the software:**
+```bash
+gh repo clone shahid11885/etradeMCP
 
-   ```bash
-   source venv/bin/activate
-   ```
+```
 
-## Running Code
+---
 
-To authorize and generate tokens, execute the `etrade-auth.sh` script:
+## Step 2: Add your API keys
+
+Next, configure the server with your API credentials.
+
+1. Navigate to the config folder: `cd $HOME/mcp/etradeMCP/config`
+2. Look for a file named `config.ini.example`.
+3. **Rename it** to `config.ini`.
+4. Open it with a text editor and paste your **Consumer Key** and **Consumer Secret** from E*TRADE into the matching spots.
+
+---
+
+## Step 3: Authenticate and prepare the environment
+
+Run the following commands to set up the environment and authenticate with E*TRADE.
+
+1. **One-time Setup:** (Sets up the environment)
+```bash
+./setup_env.sh
+
+```
+
+
+2. **Authenticate (run on days you use the tool):**
 ```bash
 ./etrade-auth.sh
-```
-**Important:** E*TRADE tokens expire daily. Please run this script each day before using the application to ensure a valid session.
 
-After authorization, you can run the CLI application (for Advanced users) or the MCP server as needed.
-For the CLI application:
-```bash
-python src/cli/main.py
 ```
-For the MCP server:
-```bash
-python src/mcp/server.py
+
+
+> **Note:** E*TRADE authentication expires periodically. Run `./etrade-auth.sh` on the days you plan to use the MCP server.
+
+---
+
+## Step 4: Configure your AI client to use the MCP server
+
+Configure your AI client to start the MCP server as a local process.
+
+### For Gemini Users
+
+Open the file `$HOME/.gemini/settings.json` and paste this inside the `mcpServers` section:
+
+```json
+"etrade": {
+  "command": "$HOME/mcp/etradeMCP/venv/bin/python",
+  "args": ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
+  "env": {
+    "PYTHONPATH": "$HOME/mcp/etradeMCP/"
+  }
+}
+
 ```
+
+### For Claude Desktop Users
+
+Open the file `$HOME/Library/Application Support/Claude/claude_desktop_config.json` and paste this inside the `mcpServers` section:
+Example configuration is shown below. Replace the home directory path (for example, `/Users/shahid`) with your own.
+
+```json
+{
+  "mcpServers": {
+
+    "etrade" : {
+      "command": "/Users/shahid/mcp/etradeMCP/venv/bin/python",
+      "args":   ["/Users/shahid/mcp/etradeMCP/src/mcp/server.py"],
+      "env": {
+        "PYTHONPATH" : "/Users/shahid/mcp/etradeMCP/"
+      }
+    }
+
+  }
+}
+
+
+```
+
+---
+
+## Step 5: Validate the setup
+
+Restart your Claude or Gemini app. Type the following to see if it works:
+
+* *"Show my E*TRADE balance"*
+* *"What are my current holdings?"*
+
