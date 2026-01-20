@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E*TRADE MCP Server: Comprehensive Guide</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-purple) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--text-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        a:hover {
+            border-bottom-color: var(--primary-color);
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+            background-color: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #e11d48;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+            font-size: 0.875rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note strong {
+            color: #92400e;
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-purple));
+            margin: 3rem 0;
+            border-radius: 2px;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        strong {
+            color: var(--text-color);
+        }
+
+        .toc {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            padding: 0.25rem 0;
+        }
+
+        .toc a {
+            color: var(--text-muted);
+        }
+
+        .toc a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Code block with copy button */
+        .code-block {
+            position: relative;
+            margin: 1.5rem 0;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding-right: 4rem;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #94a3b8;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-green);
+            color: white;
+            border-color: var(--accent-green);
+        }
+
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            header {
+                padding: 2rem 1rem;
+            }
+
+            header h1 {
+                font-size: 1.75rem;
+            }
+
+            pre {
+                padding: 1rem;
+                font-size: 0.8rem;
+            }
+
+            .copy-btn {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>E*TRADE MCP Server</h1>
+        <p>Comprehensive Guide</p>
+    </header>
+
+    <div class="container">
+        <p>This guide provides a complete overview of the E*TRADE MCP Server, from installation to advanced usage. It will walk you through connecting your E*TRADE account to AI tools like <strong>Claude</strong> or <strong>Gemini</strong>, and then explain how to leverage this connection for powerful, real-time financial analysis.</p>
+
+        <hr>
+
+        <section class="section">
+            <h1 id="part1">Part 1: Real-Time Brokerage Data for LLM-Based Financial Analysis</h1>
+
+            <p>Large Language Models (LLMs) like ChatGPT, Gemini, and Claude have revolutionized how we interact with information. However, their incredible power has, until now, been severely limited when it comes to personal financial analysis. They are like a brilliant financial analyst locked in a room with no internet and no access to your personal files.</p>
+
+            <p>Standard chatbots face three practical limitations for personal financial analysis:</p>
+
+            <ol>
+                <li><strong>Stale, Generic Knowledge:</strong> LLMs are trained on vast but static datasets. Their knowledge of the market is a snapshot from the past, making them unaware of today's prices, news, or economic indicators. Financial markets are dynamic, and yesterday's information is often irrelevant.</li>
+                <li><strong>Lack of Real-Time Portfolio Access:</strong> They are completely disconnected from your live brokerage accounts. They don't know what you own, your cost basis, how concentrated your positions are, or how your portfolio is performing <em>right now</em>.</li>
+                <li><strong>Inability to Take Action:</strong> Without live data, they cannot perform concrete, actionable analysis. They can talk about financial strategies in theory, but they can't fetch a real-time option chain to find a specific contract, calculate a premium, or assess the risk of a trade based on live market conditions.</li>
+            </ol>
+
+            <div class="highlight-box">
+                <p>This is where a <strong>Model Context Protocol (MCP) server</strong> becomes a game-changer. By acting as a secure bridge between the LLM and your brokerage account, an MCP server provides the live data needed for truly personalized and actionable financial insights. It gives the LLM "eyes and ears" into your financial world, transforming it from a generalist into a specialist.</p>
+            </div>
+
+            <h2>The E*TRADE MCP Server: Your Personal Financial Analyst</h2>
+
+            <p>This project provides an MCP server specifically designed to connect with the E*TRADE API. It empowers your LLM with the ability to:</p>
+
+            <ul>
+                <li><strong>List your brokerage accounts.</strong></li>
+                <li><strong>Fetch your real-time portfolio holdings.</strong></li>
+                <li><strong>Get real-time quotes for stocks and options.</strong></li>
+                <li><strong>Analyze option chains to identify opportunities.</strong></li>
+            </ul>
+
+            <p>This direct access bridges the gap between theoretical knowledge and practical application. An LLM can now go from a vague suggestion like "you could sell covered calls" to a precise, actionable insight like, "Based on your 1,000 shares of AAPL and current market prices, you could consider selling the October 85 call, which has a delta of 0.12 and is currently trading at a premium of .50."</p>
+
+            <p>This setup democratizes access to sophisticated financial analysis, putting tools once reserved for hedge funds and professional traders directly into the hands of individual investors.</p>
+
+            <h2>Sample Portfolio and Analysis</h2>
+
+            <p>For <strong>Prompt 2: Uploaded Portfolio Analysis</strong>, we utilized the input data from <code>sample/sample-positions-01.csv</code>. The comprehensive analysis generated by Claude Desktop, based on this prompt and input, is available in <code>sample/sample-positions-01.pdf</code>.</p>
+
+            <h2>A Powerful Use-Case: Deep Portfolio Analysis with a Sophisticated Prompt</h2>
+
+            <p>The true power of this approach is unlocked when you combine it with a detailed and sophisticated prompt. A well-crafted prompt can guide the LLM to perform a deep analysis of your portfolio, identify risks, and even suggest income-generating strategies.</p>
+
+            <p>Here is an example of Prompt 1, designed to analyze a portfolio (fetched from your E*TRADE account), focusing on risk management and generating passive income through a low-risk covered call program:</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyToClipboard(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy
+                </button>
+                <pre><code>
+You are my portfolio analyst. You have access to an MCP server called "ETrade" that can return real-time equity quotes, historical prices, and full option chains, and it can also retrieve my portfolio holdings for a specified brokerage account.
+If I have more than one brokerage account, list the available accounts and prompt me to select which one to analyze before fetching holdings.
+
+Objective
+
+Analyze the selected account portfolio for:
+1.Deep risk/exposure analysis (factor, sector, single-name, beta, concentration, correlation)
+2.Downside risk management / hedging recommendations (costed and sized)
+3.A low-assignment-risk covered call program to generate supplemental cashflow without materially compromising long-term growth
+
+Accounts in scope
+•Primary scope: the brokerage account I select (fetch holdings via ETrade MCP)
+•Optional: If I provide other account holdings manually, include them separately; do not blend tax assumptions across accounts.
+
+⸻
+
+Assumptions / constraints (must follow)
+1.Minimize risk of assignment on covered calls (prioritize low delta, liquidity, roll rules, and avoidance of earnings/dividend early-assignment risk).
+2.Growth is preferred over income (do not aggressively cap upside; premiums are secondary).
+3.Avoid sales whenever possible (some positions have very low cost basis; avoid realizing gains and avoid assignment that would trigger taxable sales).
+4.No liquidity events planned within the next 12 months (do not design around near-term cash needs).
+5.QQQ options are permitted for hedging and/or overlay strategies if appropriate.
+
+If any assumption conflicts with a recommended trade, explicitly call out the conflict and provide an alternative.
+
+⸻
+
+Required tool usage (ETrade MCP)
+1.Fetch portfolio holdings for the selected brokerage account via ETrade MCP (ticker, shares, average cost if available, market value if available).
+2.Pull current quotes for all tickers in the selected account.
+3.Pull 1y daily prices (or longest available) for volatility/correlation/beta estimates.
+4.Pull option chains for each eligible holding (at least next 3 monthly expirations), including bid/ask, IV, delta, open interest, and volume.
+5.Pull QQQ option chains as needed for hedging overlays.
+6.If any tool call fails or data is missing, explicitly state what's missing and proceed with best-effort assumptions.
+
+⸻
+
+Deliverables (must be structured exactly as follows)
+
+1) Portfolio Snapshot (Selected Account)
+•Total market value (and cash, if available from ETrade)
+•Table by holding: ticker, shares, price, market value, % weight, 1y vol, beta vs SPY (estimate), dividend yield (if available)
+•Concentration stats: top 1, top 5, top 10; Herfindahl index; single-name risk callout
+
+2) Exposure Map
+•Sector allocation (standard classification; if inferred, label "inferred")
+•Factor/style proxies: growth/value tilt, momentum proxy, quality proxy, duration sensitivity proxy
+•Correlation clusters: identify groups moving together; highlight hidden concentration and "same-trade" exposure (e.g., mega-cap tech overlap)
+
+3) Risk Diagnosis
+•Quantified risks where possible:
+•Market beta risk and drawdown sensitivity
+•Sector risk
+•Volatility risk
+•Liquidity/options-market quality risk (spreads, OI, volume)
+•Tail risk (gap risk, earnings risk)
+•Scenario analysis with assumptions:
+•-10% SPY, -20% SPY, rate shock, volatility spike
+•Flag holdings where covered calls are structurally unattractive for my goals (thin options, chronic gap risk, too much upside cap vs premium)
+
+4) Covered Call Program (low-assignment-risk, growth-first)
+
+Design a covered call approach that explicitly minimizes assignment and avoids realizing gains:
+•Eligibility rules:
+•Minimum liquidity thresholds (OI/volume/spread)
+•Avoid earnings windows and high early-assignment risk periods (dividends)
+•Strike selection rules that preserve upside (growth-first)
+•For each eligible holding, propose 2 candidates max (to reduce noise), focused on low assignment probability:
+•"Ultra-conservative" target delta ~0.08–0.15
+•"Conservative" target delta ~0.15–0.22
+For each candidate include:
+•Expiration, strike, delta, IV, mid premium, premium % of underlying, simple annualized yield, distance to strike (%), assignment risk assessment, liquidity notes (spread/OI/volume), and any earnings/dividend considerations
+•Recommended contracts (#) based on shares and concentration limits
+•A portfolio-level premium estimate range (monthly) and upside cap implications
+
+Management rules (must be explicit):
+•When to close early (e.g., 50–75% premium captured, or delta rises beyond threshold)
+•When/how to roll up and/or out to avoid assignment (defined triggers)
+•What to do if price approaches strike (priority = avoid assignment; define roll mechanics)
+•A "do-not-write" rule set when risk of forced sale is elevated
+
+5) Hedging Plan (QQQ permitted)
+
+Provide a hedging menu aligned to portfolio exposures and growth preference:
+•Prefer index-based hedges (QQQ and/or SPY) to avoid selling individual low-basis names
+•Candidate approaches (as applicable):
+•Put spreads / collars on QQQ
+•Crash protection overlays with defined annual budget (financed partially by call premiums if feasible without harming growth)
+•For each hedge: sizing method, candidate contracts with quotes, expected carry cost, and how it reduces drawdown under the scenarios in section 3
+
+6) Opportunities / Optimizations (non-sale-biased)
+•Identify risk reductions that do not require selling (hedges, overlays, diversification via new contributions if any, or reallocations only if explicitly permitted)
+•Identify holdings where options pricing is favorable without meaningfully capping upside
+•90-day execution plan with a weekly checklist (including earnings calendar checks, roll dates, monitoring metrics)
+
+7) Questions / Assumptions
+
+List the top 5 questions that would materially change recommendations (e.g., tax treatment specifics of the selected account, willingness to realize gains under any circumstance, margin permissions, option approval level), but still provide a complete first-pass plan using the assumptions above.
+
+⸻
+
+Important constraints
+•Do not provide generic education. Use the holdings fetched from ETrade for the selected account and real option/quote data.
+•Prioritize execution realism (liquidity, spreads, assignment mechanics).
+•Be explicit about risks: covered calls cap upside; hedges cost carry; and assignment can trigger unwanted taxable sales—avoid it per assumptions.
+•Keep outputs actionable: specific contracts, strikes, expirations, contract counts, and roll/close triggers.</code></pre>
+            </div>
+
+            <h3>The Prompt Explained</h3>
+
+            <p>This prompt is a detailed set of instructions for the LLM, now supercharged with the E*TRADE MCP server. It tells the model to:</p>
+
+            <ul>
+                <li><strong>Analyze the user's holdings</strong> in terms of risk profile and biases.</li>
+                <li><strong>Suggest a passive income strategy</strong> by selling specific covered calls with a low risk of assignment.</li>
+                <li><strong>Fetch the appropriate option chains</strong> for the user's holdings to identify the exact covered calls to sell.</li>
+                <li><strong>Analyze existing call positions</strong> and recommend whether to hold, close, or roll them.</li>
+                <li><strong>Suggest hedging strategies</strong>, such as buying PUTs, to mitigate downside risk if the portfolio is overexposed.</li>
+            </ul>
+
+            <hr>
+            <hr>
+
+            <p>Here is an example of Prompt 2, designed to analyze an <em><strong>uploaded</strong></em> portfolio, focusing on risk management and generating passive income through a low-risk covered call program:</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyToClipboard(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy
+                </button>
+                <pre><code>
+You are my portfolio analyst. You have access to an MCP server called "ETrade" that can return real-time equity quotes, historical prices, and full option chains, and it can also retrieve my portfolio holdings for a specified brokerage account.
+If I have more than one brokerage account, list the available accounts and prompt me to select which one to analyze before fetching holdings.
+
+Objective
+
+Analyze the selected account portfolio for:
+1.Deep risk/exposure analysis (factor, sector, single-name, beta, concentration, correlation)
+2.Downside risk management / hedging recommendations (costed and sized)
+3.A low-assignment-risk covered call program to generate supplemental cashflow without materially compromising long-term growth
+
+Accounts in scope
+•Primary scope: the brokerage account I select (fetch holdings via ETrade MCP)
+•Optional: If I provide other account holdings manually, include them separately; do not blend tax assumptions across accounts.
+
+⸻
+
+Assumptions / constraints (must follow)
+1.Minimize risk of assignment on covered calls (prioritize low delta, liquidity, roll rules, and avoidance of earnings/dividend early-assignment risk).
+2.Growth is preferred over income (do not aggressively cap upside; premiums are secondary).
+3.Avoid sales whenever possible (some positions have very low cost basis; avoid realizing gains and avoid assignment that would trigger taxable sales).
+4.No liquidity events planned within the next 12 months (do not design around near-term cash needs).
+5.QQQ options are permitted for hedging and/or overlay strategies if appropriate.
+
+If any assumption conflicts with a recommended trade, explicitly call out the conflict and provide an alternative.
+
+⸻
+
+Required tool usage (ETrade MCP)
+1.Fetch portfolio holdings for the selected brokerage account via ETrade MCP (ticker, shares, average cost if available, market value if available).
+2.Pull current quotes for all tickers in the selected account.
+3.Pull 1y daily prices (or longest available) for volatility/correlation/beta estimates.
+4.Pull option chains for each eligible holding (at least next 3 monthly expirations), including bid/ask, IV, delta, open interest, and volume.
+5.Pull QQQ option chains as needed for hedging overlays.
+6.If any tool call fails or data is missing, explicitly state what's missing and proceed with best-effort assumptions.
+
+⸻
+
+Deliverables (must be structured exactly as follows)
+
+1) Portfolio Snapshot (Selected Account)
+•Total market value (and cash, if available from ETrade)
+•Table by holding: ticker, shares, price, market value, % weight, 1y vol, beta vs SPY (estimate), dividend yield (if available)
+•Concentration stats: top 1, top 5, top 10; Herfindahl index; single-name risk callout
+
+2) Exposure Map
+•Sector allocation (standard classification; if inferred, label "inferred")
+•Factor/style proxies: growth/value tilt, momentum proxy, quality proxy, duration sensitivity proxy
+•Correlation clusters: identify groups moving together; highlight hidden concentration and "same-trade" exposure (e.g., mega-cap tech overlap)
+
+3) Risk Diagnosis
+•Quantified risks where possible:
+•Market beta risk and drawdown sensitivity
+•Sector risk
+•Volatility risk
+•Liquidity/options-market quality risk (spreads, OI, volume)
+•Tail risk (gap risk, earnings risk)
+•Scenario analysis with assumptions:
+•-10% SPY, -20% SPY, rate shock, volatility spike
+•Flag holdings where covered calls are structurally unattractive for my goals (thin options, chronic gap risk, too much upside cap vs premium)
+
+4) Covered Call Program (low-assignment-risk, growth-first)
+
+Design a covered call approach that explicitly minimizes assignment and avoids realizing gains:
+•Eligibility rules:
+•Minimum liquidity thresholds (OI/volume/spread)
+•Avoid earnings windows and high early-assignment risk periods (dividends)
+•Strike selection rules that preserve upside (growth-first)
+•For each eligible holding, propose 2 candidates max (to reduce noise), focused on low assignment probability:
+•"Ultra-conservative" target delta ~0.08–0.15
+•"Conservative" target delta ~0.15–0.22
+For each candidate include:
+•Expiration, strike, delta, IV, mid premium, premium % of underlying, simple annualized yield, distance to strike (%), assignment risk assessment, liquidity notes (spread/OI/volume), and any earnings/dividend considerations
+•Recommended contracts (#) based on shares and concentration limits
+•A portfolio-level premium estimate range (monthly) and upside cap implications
+
+Management rules (must be explicit):
+•When to close early (e.g., 50–75% premium captured, or delta rises beyond threshold)
+•When/how to roll up and/or out to avoid assignment (defined triggers)
+•What to do if price approaches strike (priority = avoid assignment; define roll mechanics)
+•A "do-not-write" rule set when risk of forced sale is elevated
+
+5) Hedging Plan (QQQ permitted)
+
+Provide a hedging menu aligned to portfolio exposures and growth preference:
+•Prefer index-based hedges (QQQ and/or SPY) to avoid selling individual low-basis names
+•Candidate approaches (as applicable):
+•Put spreads / collars on QQQ
+•Crash protection overlays with defined annual budget (financed partially by call premiums if feasible without harming growth)
+•For each hedge: sizing method, candidate contracts with quotes, expected carry cost, and how it reduces drawdown under the scenarios in section 3
+
+6) Opportunities / Optimizations (non-sale-biased)
+•Identify risk reductions that do not require selling (hedges, overlays, diversification via new contributions if any, or reallocations only if explicitly permitted)
+•Identify holdings where options pricing is favorable without meaningfully capping upside
+•90-day execution plan with a weekly checklist (including earnings calendar checks, roll dates, monitoring metrics)
+
+7) Questions / Assumptions
+
+List the top 5 questions that would materially change recommendations (e.g., tax treatment specifics of the selected account, willingness to realize gains under any circumstance, margin permissions, option approval level), but still provide a complete first-pass plan using the assumptions above.
+
+⸻
+
+Important constraints
+•Do not provide generic education. Use the holdings fetched from ETrade for the selected account and real option/quote data.
+•Prioritize execution realism (liquidity, spreads, assignment mechanics).
+•Be explicit about risks: covered calls cap upside; hedges cost carry; and assignment can trigger unwanted taxable sales—avoid it per assumptions.
+•Keep outputs actionable: specific contracts, strikes, expirations, contract counts, and roll/close triggers.</code></pre>
+            </div>
+
+            <h3>The Prompt Explained</h3>
+
+            <p>This prompt is a detailed set of instructions for the LLM, now supercharged with the E*TRADE MCP server. It tells the model to:</p>
+
+            <ul>
+                <li><strong>Analyze the user's holdings</strong> in terms of risk profile and biases.</li>
+                <li><strong>Suggest a passive income strategy</strong> by selling specific covered calls with a low risk of assignment.</li>
+                <li><strong>Fetch the appropriate option chains</strong> for the user's holdings to identify the exact covered calls to sell.</li>
+                <li><strong>Analyze existing call positions</strong> and recommend whether to hold, close, or roll them.</li>
+                <li><strong>Suggest hedging strategies</strong>, such as buying PUTs, to mitigate downside risk if the portfolio is overexposed.</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section class="section">
+            <h1 id="part2">Part 2: Installation</h1>
+
+            <p>This section explains how to connect your E*TRADE account to your AI assistant. Once configured, you can ask questions such as "Show my portfolio" or "Analyze my brokerage account risk."</p>
+
+            <hr>
+
+            <h2>Prerequisites</h2>
+
+            <p><strong>Requirements:</strong></p>
+
+            <ul>
+                <li>Familiarity with basic terminal usage</li>
+            </ul>
+
+            <p><strong>E*TRADE developer credentials</strong></p>
+
+            <div class="card">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Get E*TRADE API keys:</strong>
+                        <ul>
+                            <li>Go to <a href="https://developer.etrade.com/home">E*TRADE Developer Portal</a>.</li>
+                            <li>Follow their steps to get your <strong>Consumer Key</strong> and <strong>Consumer Secret</strong>.</li>
+                            <li>These credentials are used by the MCP server to authenticate with E*TRADE.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <p><strong>Source control tooling</strong></p>
+
+            <div class="card">
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Install GitHub CLI (<code>gh</code>):</strong>
+                        <ul>
+                            <li>If you don't have it, download it <a href="https://cli.github.com/">here</a>. This tool lets you download the code easily.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h2>Step 1: Download the code</h2>
+
+            <p>Open your <strong>Terminal</strong> (on Mac, press <code>Cmd + Space</code> and type "Terminal") and copy-paste these lines one by one:</p>
+
+            <div class="card">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Create a folder for the project:</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyToClipboard(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copy
+                            </button>
+                            <pre><code>mkdir -p $HOME/mcp
+cd $HOME/mcp</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Download the software:</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyToClipboard(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copy
+                            </button>
+                            <pre><code>gh repo clone shahid11885/etradeMCP</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h2>Step 2: Add your API keys</h2>
+
+            <p>Next, configure the server with your API credentials.</p>
+
+            <ol>
+                <li>Navigate to the config folder: <code>cd $HOME/mcp/etradeMCP/config</code></li>
+                <li>Look for a file named <code>config.ini.example</code>.</li>
+                <li><strong>Rename it</strong> to <code>config.ini</code>.</li>
+                <li>Open it with a text editor and paste your <strong>Consumer Key</strong> and <strong>Consumer Secret</strong> from E*TRADE into the matching spots.</li>
+            </ol>
+
+            <hr>
+
+            <h2>Step 3: Authenticate and prepare the environment</h2>
+
+            <p>Run the following commands to set up the environment and authenticate with E*TRADE.</p>
+
+            <div class="card">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>One-time Setup:</strong> (Sets up the environment)
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyToClipboard(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copy
+                            </button>
+                            <pre><code>./setup_env.sh</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Authenticate (run on days you use the tool):</strong>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyToClipboard(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copy
+                            </button>
+                            <pre><code>./etrade-auth.sh</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> E*TRADE authentication expires periodically. Run <code>./etrade-auth.sh</code> on the days you plan to use the MCP server.
+            </div>
+
+            <hr>
+
+            <h2>Step 4: Configure your AI client to use the MCP server</h2>
+
+            <p>Configure your AI client to start the MCP server as a local process.</p>
+
+            <h3>For Gemini Users</h3>
+
+            <p>Open the file <code>$HOME/.gemini/settings.json</code> and copy this section:</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyToClipboard(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy
+                </button>
+                <pre><code>{
+  "mcpServers": {
+
+    "etrade" : {
+      "command": "$HOME/mcp/etradeMCP/venv/bin/python",
+      "args":   ["$HOME/mcp/etradeMCP/src/mcp/server.py"],
+      "env": {
+        "PYTHONPATH" : "/Users/shahid/mcp/etradeMCP/"
+      }
+    }
+
+  }
+}</code></pre>
+            </div>
+
+            <h3>For Claude Desktop Users</h3>
+
+            <p>Open the file <code>$HOME/Library/Application Support/Claude/claude_desktop_config.json</code> and copy this section:</p>
+            <p>Example configuration is shown below. Replace the home directory path (for example, <code>/Users/shahid</code>) with your own.</p>
+            <p>Unfortunately, you cannot use $HOME here. It didnt work for me.</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyToClipboard(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy
+                </button>
+                <pre><code>{
+  "mcpServers": {
+
+    "etrade" : {
+      "command": "/Users/shahid/mcp/etradeMCP/venv/bin/python",
+      "args":   ["/Users/shahid/mcp/etradeMCP/src/mcp/server.py"],
+      "env": {
+        "PYTHONPATH" : "/Users/shahid/mcp/etradeMCP/"
+      }
+    }
+
+  }
+}</code></pre>
+            </div>
+
+            <hr>
+
+            <h2>Step 5: Validate the setup</h2>
+
+            <p>Restart your Claude or Gemini app. Type the following to see if it works:</p>
+
+            <ul>
+                <li><em>"Show my E*TRADE balance"</em></li>
+                <li><em>"What are my current holdings?"</em></li>
+            </ul>
+        </section>
+    </div>
+
+    <script>
+        function copyToClipboard(button) {
+            const codeBlock = button.parentElement.querySelector('pre code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                // Update button to show success
+                const originalContent = button.innerHTML;
+                button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Copied!
+                `;
+                button.classList.add('copied');
+
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const originalContent = button.innerHTML;
+                    button.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Copied!
+                    `;
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.innerHTML = originalContent;
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (e) {
+                    console.error('Fallback copy failed: ', e);
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+    </script>
+</body>
+</html>
