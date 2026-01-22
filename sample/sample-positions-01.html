@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Analysis Report</title>
+    <style>
+        :root {
+            --primary: #1E3A5F;
+            --primary-light: #2C5282;
+            --accent: #3182CE;
+            --success: #38A169;
+            --warning: #D69E2E;
+            --danger: #E53E3E;
+            --bg: #F7FAFC;
+            --card-bg: #FFFFFF;
+            --text: #2D3748;
+            --text-light: #718096;
+            --border: #E2E8F0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--primary);
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .nav-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .nav-header h2 {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .nav-header p {
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .nav a {
+            display: block;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav a:hover, .nav a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: var(--accent);
+        }
+        
+        .nav a.sub {
+            padding-left: 35px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .nav a.sub:hover {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        /* Main Content */
+        .main {
+            margin-left: 280px;
+            padding: 30px 40px;
+            max-width: 1200px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .header .meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card .label {
+            font-size: 13px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .summary-card .change {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .summary-card .change.positive { color: var(--success); }
+        .summary-card .change.negative { color: var(--danger); }
+        .summary-card .change.warning { color: var(--warning); }
+        
+        /* Sections */
+        .section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .section h3 {
+            color: var(--primary-light);
+            font-size: 18px;
+            font-weight: 600;
+            margin: 25px 0 15px;
+        }
+        
+        .section h4 {
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 10px;
+        }
+        
+        .section p {
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tr:hover {
+            background: #F7FAFC;
+        }
+        
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success { background: #C6F6D5; color: #22543D; }
+        .badge-warning { background: #FEFCBF; color: #744210; }
+        .badge-danger { background: #FED7D7; color: #822727; }
+        .badge-info { background: #BEE3F8; color: #2A4365; }
+        .badge-neutral { background: #E2E8F0; color: #4A5568; }
+        
+        /* Risk Indicators */
+        .risk-high { background: #FED7D7; }
+        .risk-extreme { background: #FEB2B2; }
+        .risk-medium { background: #FEFCBF; }
+        .risk-low { background: #C6F6D5; }
+        
+        /* Alert Boxes */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+        
+        .alert-danger {
+            background: #FFF5F5;
+            border-color: var(--danger);
+            color: #822727;
+        }
+        
+        .alert-warning {
+            background: #FFFFF0;
+            border-color: var(--warning);
+            color: #744210;
+        }
+        
+        .alert-success {
+            background: #F0FFF4;
+            border-color: var(--success);
+            color: #22543D;
+        }
+        
+        .alert-info {
+            background: #EBF8FF;
+            border-color: var(--accent);
+            color: #2A4365;
+        }
+        
+        .alert strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        /* Progress Bars */
+        .progress-bar {
+            background: var(--border);
+            border-radius: 10px;
+            height: 24px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            transition: width 0.5s ease;
+        }
+        
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .checklist li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, #EBF8FF 0%, #E6FFFA 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        
+        .highlight-box h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .stat-item {
+            background: var(--bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            min-width: 150px;
+        }
+        
+        .stat-item .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        
+        .stat-item .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 25px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid white;
+            box-shadow: 0 0 0 3px var(--accent);
+        }
+        
+        .timeline-item h4 {
+            margin: 0 0 10px;
+            color: var(--primary);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: var(--primary);
+        }
+        
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Recommendation Card */
+        .rec-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        
+        .rec-card.recommended {
+            border-color: var(--success);
+            background: linear-gradient(to right, #F0FFF4 0%, white 100%);
+        }
+        
+        .rec-card.caution {
+            border-color: var(--warning);
+            background: linear-gradient(to right, #FFFFF0 0%, white 100%);
+        }
+        
+        .rec-card.avoid {
+            border-color: var(--danger);
+            background: linear-gradient(to right, #FFF5F5 0%, white 100%);
+        }
+        
+        .rec-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .rec-card-header h4 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .nav { display: none; }
+            .main { margin-left: 0; }
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            .main { margin-left: 0; padding: 15px; }
+            .header { padding: 25px; }
+            .header h1 { font-size: 24px; }
+            .section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-header">
+            <h2>Portfolio Analysis</h2>
+            <p>January 22, 2026</p>
+        </div>
+        <a href="#summary">Executive Summary</a>
+        <a href="#snapshot" class="sub">Portfolio Snapshot</a>
+        <a href="#exposure">Exposure Map</a>
+        <a href="#sector" class="sub">Sector Allocation</a>
+        <a href="#factors" class="sub">Factor Exposure</a>
+        <a href="#correlation" class="sub">Correlation Clusters</a>
+        <a href="#risk">Risk Diagnosis</a>
+        <a href="#risk-quant" class="sub">Quantified Risks</a>
+        <a href="#scenarios" class="sub">Scenario Analysis</a>
+        <a href="#suitability" class="sub">CC Suitability</a>
+        <a href="#covered-calls">Covered Call Program</a>
+        <a href="#cc-rules" class="sub">Eligibility Rules</a>
+        <a href="#cc-qqq" class="sub">QQQ Recommendations</a>
+        <a href="#cc-aapl" class="sub">AAPL Recommendations</a>
+        <a href="#cc-googl" class="sub">GOOGL Recommendations</a>
+        <a href="#cc-arm" class="sub">ARM (Avoid)</a>
+        <a href="#cc-summary" class="sub">Premium Summary</a>
+        <a href="#cc-management" class="sub">Management Rules</a>
+        <a href="#hedging">Hedging Plan</a>
+        <a href="#hedge-spread" class="sub">Put Spread Strategy</a>
+        <a href="#hedge-collar" class="sub">Collar Alternative</a>
+        <a href="#opportunities">Opportunities</a>
+        <a href="#execution">90-Day Plan</a>
+        <a href="#questions">Questions</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Header -->
+        <header class="header">
+            <h1>Portfolio Analysis Report</h1>
+            <p class="subtitle">Combined Account Analysis: Rollover IRA + Roth IRA</p>
+            <div class="meta">
+                <span>📅 January 22, 2026</span>
+                <span>💼 007-1234567 (Rollover) + 009-9876543 (Roth)</span>
+                <span>📊 Risk Analysis | Covered Calls | Hedging</span>
+            </div>
+        </header>
+
+        <!-- Summary Cards -->
+        <section id="summary">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="label">Total Portfolio Value</div>
+                    <div class="value">$3.92M</div>
+                    <div class="change">Across 2 accounts</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Portfolio Beta</div>
+                    <div class="value">1.18</div>
+                    <div class="change warning">⚠️ Above market</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Top 2 Concentration</div>
+                    <div class="value">81.7%</div>
+                    <div class="change negative">🚨 Extreme</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Est. Monthly Premium</div>
+                    <div class="value">$10-13K</div>
+                    <div class="change positive">✓ From covered calls</div>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                <strong>🚨 Critical Risk Alert</strong>
+                Your portfolio has extreme concentration risk with ~40% effective AAPL exposure (direct + via QQQ), ~78% tech sector exposure, and a Herfindahl Index of 0.36. A 20% market correction could result in approximately $940,000 drawdown (-24%).
+            </div>
+        </section>
+
+        <!-- Section 1: Portfolio Snapshot -->
+        <section id="snapshot" class="section">
+            <h2>1. Portfolio Snapshot</h2>
+            
+            <h3>1.1 Combined Account Summary</h3>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-label">Rollover IRA</div>
+                    <div class="stat-value">$3.50M</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Roth IRA</div>
+                    <div class="stat-value">$425.7K</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Total Cash</div>
+                    <div class="stat-value">$2,348</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Portfolio Beta</div>
+                    <div class="stat-value">1.18</div>
+                </div>
+            </div>
+
+            <h3>1.2 Holdings Detail</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Shares</th>
+                            <th class="text-right">Price</th>
+                            <th class="text-right">Market Value</th>
+                            <th class="text-right">Weight</th>
+                            <th class="text-center">Beta</th>
+                            <th class="text-center">Yield</th>
+                            <th class="text-center">Account</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>QQQ</strong></td>
+                            <td>3,200</td>
+                            <td class="text-right">$611.24</td>
+                            <td class="text-right">$1,955,968</td>
+                            <td class="text-right"><strong>49.8%</strong></td>
+                            <td class="text-center">1.28</td>
+                            <td class="text-center">0.45%</td>
+                            <td class="text-center"><span class="badge badge-info">Both</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>AAPL</strong></td>
+                            <td>5,000</td>
+                            <td class="text-right">$249.81</td>
+                            <td class="text-right">$1,249,050</td>
+                            <td class="text-right"><strong>31.8%</strong></td>
+                            <td class="text-center">0.90</td>
+                            <td class="text-center">0.41%</td>
+                            <td class="text-center"><span class="badge badge-neutral">Rollover</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>FBGRX*</strong></td>
+                            <td>1,250</td>
+                            <td class="text-right">$268.21</td>
+                            <td class="text-right">$335,263</td>
+                            <td class="text-right">8.5%</td>
+                            <td class="text-center">~1.2</td>
+                            <td class="text-center">0.0%</td>
+                            <td class="text-center"><span class="badge badge-neutral">Rollover</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>GOOGL</strong></td>
+                            <td>600</td>
+                            <td class="text-right">$324.91</td>
+                            <td class="text-right">$194,946</td>
+                            <td class="text-right">5.0%</td>
+                            <td class="text-center">1.36</td>
+                            <td class="text-center">0.25%</td>
+                            <td class="text-center"><span class="badge badge-success">Roth</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ARM</strong></td>
+                            <td>1,000</td>
+                            <td class="text-right">$108.55</td>
+                            <td class="text-right">$108,550</td>
+                            <td class="text-right">2.8%</td>
+                            <td class="text-center">2.43</td>
+                            <td class="text-center">0.0%</td>
+                            <td class="text-center"><span class="badge badge-success">Roth</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>FICDX*</strong></td>
+                            <td>635</td>
+                            <td class="text-right">$79.42</td>
+                            <td class="text-right">$50,432</td>
+                            <td class="text-right">1.3%</td>
+                            <td class="text-center">~0.9</td>
+                            <td class="text-center">1.2%</td>
+                            <td class="text-center"><span class="badge badge-neutral">Rollover</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>MINDX*</strong></td>
+                            <td>1,216</td>
+                            <td class="text-right">$23.35</td>
+                            <td class="text-right">$28,394</td>
+                            <td class="text-right">0.7%</td>
+                            <td class="text-center">~1.0</td>
+                            <td class="text-center">0.0%</td>
+                            <td class="text-center"><span class="badge badge-neutral">Rollover</span></td>
+                        </tr>
+                        <tr style="background: #F7FAFC;">
+                            <td><strong>Cash</strong></td>
+                            <td>-</td>
+                            <td class="text-right">-</td>
+                            <td class="text-right">$2,348</td>
+                            <td class="text-right">0.1%</td>
+                            <td class="text-center">-</td>
+                            <td class="text-center">-</td>
+                            <td class="text-center"><span class="badge badge-neutral">Rollover</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><em>* Mutual fund - not optionable. Beta estimated.</em></p>
+
+            <h3>1.3 Concentration Statistics</h3>
+            <div class="highlight-box">
+                <div class="two-col">
+                    <div>
+                        <p><strong>Top 1 Position (QQQ):</strong> 49.8%</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 49.8%; background: var(--danger);">49.8%</div>
+                        </div>
+                        
+                        <p><strong>Top 2 Positions (QQQ + AAPL):</strong> 81.7%</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 81.7%; background: var(--danger);">81.7%</div>
+                        </div>
+                        
+                        <p><strong>Top 5 Positions:</strong> 97.9%</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 97.9%; background: var(--warning);">97.9%</div>
+                        </div>
+                    </div>
+                    <div>
+                        <p><strong>Herfindahl-Hirschman Index (HHI):</strong></p>
+                        <div class="stat-item" style="background: #FED7D7;">
+                            <div class="stat-value" style="color: var(--danger);">0.36</div>
+                            <div class="stat-label" style="color: #822727;">HIGHLY CONCENTRATED</div>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 13px; color: var(--text-light);">
+                            HHI > 0.25 indicates high concentration risk. A well-diversified portfolio typically has HHI < 0.10.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Exposure Map -->
+        <section id="exposure" class="section">
+            <h2>2. Exposure Map</h2>
+            
+            <h3 id="sector">2.1 Sector Allocation (Inferred)</h3>
+            <p>The portfolio is overwhelmingly concentrated in Technology:</p>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sector</th>
+                            <th class="text-right">Est. Weight</th>
+                            <th>Contributors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="risk-extreme">
+                            <td><strong>Technology</strong></td>
+                            <td class="text-right"><strong>~78%</strong></td>
+                            <td>QQQ, AAPL, ARM, GOOGL, FBGRX</td>
+                        </tr>
+                        <tr>
+                            <td>Communication Services</td>
+                            <td class="text-right">~8%</td>
+                            <td>QQQ (GOOG/META), GOOGL</td>
+                        </tr>
+                        <tr>
+                            <td>Consumer Discretionary</td>
+                            <td class="text-right">~6%</td>
+                            <td>QQQ (AMZN, TSLA)</td>
+                        </tr>
+                        <tr>
+                            <td>International (Canada)</td>
+                            <td class="text-right">~1.3%</td>
+                            <td>FICDX</td>
+                        </tr>
+                        <tr>
+                            <td>International (India)</td>
+                            <td class="text-right">~0.7%</td>
+                            <td>MINDX</td>
+                        </tr>
+                        <tr>
+                            <td>Other</td>
+                            <td class="text-right">~6%</td>
+                            <td>QQQ (Healthcare, etc.)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 id="factors">2.2 Factor/Style Proxies</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Factor</th>
+                            <th class="text-center">Exposure</th>
+                            <th>Assessment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Growth/Value Tilt</td>
+                            <td class="text-center"><span class="badge badge-danger">STRONG GROWTH</span></td>
+                            <td>QQQ, AAPL, GOOGL, FBGRX all growth-tilted</td>
+                        </tr>
+                        <tr>
+                            <td>Size Factor</td>
+                            <td class="text-center"><span class="badge badge-warning">MEGA-CAP</span></td>
+                            <td>Dominated by largest tech names</td>
+                        </tr>
+                        <tr>
+                            <td>Momentum</td>
+                            <td class="text-center"><span class="badge badge-info">HIGH</span></td>
+                            <td>QQQ, AAPL have strong momentum</td>
+                        </tr>
+                        <tr>
+                            <td>Quality</td>
+                            <td class="text-center"><span class="badge badge-success">HIGH</span></td>
+                            <td>Strong balance sheets, high margins</td>
+                        </tr>
+                        <tr>
+                            <td>Duration Sensitivity</td>
+                            <td class="text-center"><span class="badge badge-warning">ELEVATED</span></td>
+                            <td>Growth stocks sensitive to rates</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 id="correlation">2.3 Correlation Clusters & Hidden Concentration</h3>
+            <div class="alert alert-danger">
+                <strong>CRITICAL FINDING: Extreme Hidden Concentration</strong>
+                The portfolio has dangerous hidden concentration that isn't immediately visible.
+            </div>
+            
+            <div class="highlight-box">
+                <h4>🔴 Same-Trade Exposure</h4>
+                <p>AAPL is the #1 holding in QQQ (~9% weight). Your direct AAPL position + AAPL-within-QQQ exposure creates <strong>~40% effective AAPL exposure</strong>.</p>
+            </div>
+
+            <div class="two-col" style="margin-top: 20px;">
+                <div class="rec-card">
+                    <h4>Correlation Cluster 1: Mega-Cap Tech</h4>
+                    <p><strong>Holdings:</strong> AAPL, QQQ, GOOGL, FBGRX, ARM</p>
+                    <p><strong>Combined Weight:</strong> ~97%</p>
+                    <p>All move together in risk-off events. This is essentially a single bet on US tech.</p>
+                </div>
+                <div class="rec-card">
+                    <h4>Correlation Clusters 2 & 3: International</h4>
+                    <p><strong>MINDX (India):</strong> 0.7% - minimal diversification</p>
+                    <p><strong>FICDX (Canada):</strong> 1.3% - insufficient to meaningfully diversify</p>
+                    <p>International exposure is too small to provide meaningful protection.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Risk Diagnosis -->
+        <section id="risk" class="section">
+            <h2>3. Risk Diagnosis</h2>
+            
+            <h3 id="risk-quant">3.1 Quantified Risk Assessment</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Risk Type</th>
+                            <th class="text-center">Level</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Market Beta Risk</td>
+                            <td class="text-center risk-high"><span class="badge badge-danger">HIGH</span></td>
+                            <td>Portfolio beta ~1.18. In a -20% SPY move, expect -24% drawdown (~$940K)</td>
+                        </tr>
+                        <tr>
+                            <td>Sector Concentration</td>
+                            <td class="text-center risk-extreme"><span class="badge badge-danger">EXTREME</span></td>
+                            <td>~78% technology. Tech-specific selloff could be devastating.</td>
+                        </tr>
+                        <tr>
+                            <td>Single-Name Risk</td>
+                            <td class="text-center risk-extreme"><span class="badge badge-danger">EXTREME</span></td>
+                            <td>~40% effective AAPL exposure. Any AAPL-specific event is catastrophic.</td>
+                        </tr>
+                        <tr>
+                            <td>Volatility Risk</td>
+                            <td class="text-center risk-high"><span class="badge badge-warning">ELEVATED</span></td>
+                            <td>ARM has 55%+ IV, high beta (2.43). AAPL/GOOGL/QQQ moderate (27-37% IV).</td>
+                        </tr>
+                        <tr>
+                            <td>Liquidity Risk</td>
+                            <td class="text-center risk-low"><span class="badge badge-success">LOW</span></td>
+                            <td>QQQ, AAPL, GOOGL are extremely liquid. ARM less liquid but acceptable.</td>
+                        </tr>
+                        <tr>
+                            <td>Options Market Quality</td>
+                            <td class="text-center risk-medium"><span class="badge badge-warning">MIXED</span></td>
+                            <td>QQQ/AAPL/GOOGL excellent. ARM has wide spreads (caution).</td>
+                        </tr>
+                        <tr>
+                            <td>Tail/Gap Risk</td>
+                            <td class="text-center risk-high"><span class="badge badge-warning">ELEVATED</span></td>
+                            <td>Earnings 4x/year for each stock. ARM especially prone to gaps.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 id="scenarios">3.2 Scenario Analysis</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th class="text-right">Estimated Loss</th>
+                            <th>Assumption</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SPY -10% Correction</td>
+                            <td class="text-right risk-high"><strong>-$470K (-12%)</strong></td>
+                            <td>Beta 1.18 × 10% = 11.8%</td>
+                        </tr>
+                        <tr>
+                            <td>SPY -20% Bear Market</td>
+                            <td class="text-right risk-extreme"><strong>-$940K (-24%)</strong></td>
+                            <td>Growth stocks typically fall harder</td>
+                        </tr>
+                        <tr>
+                            <td>Tech Sector -30%</td>
+                            <td class="text-right risk-extreme"><strong>-$920K (-23%)</strong></td>
+                            <td>2022-style rotation out of growth</td>
+                        </tr>
+                        <tr>
+                            <td>AAPL -20% (Idiosyncratic)</td>
+                            <td class="text-right risk-high"><strong>-$314K (-8%)</strong></td>
+                            <td>Direct + QQQ indirect exposure</td>
+                        </tr>
+                        <tr>
+                            <td>Rate Shock +100bps</td>
+                            <td class="text-right risk-high"><strong>-$390K (-10%)</strong></td>
+                            <td>Duration sensitivity of growth</td>
+                        </tr>
+                        <tr>
+                            <td>VIX Spike to 35+</td>
+                            <td class="text-right risk-high"><strong>-$590K (-15%)</strong></td>
+                            <td>Typical in panic selling</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 id="suitability">3.3 Covered Call Suitability Assessment</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th class="text-center">Suitability</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>QQQ</strong></td>
+                            <td class="text-center"><span class="badge badge-success">EXCELLENT</span></td>
+                            <td>Tight spreads, high OI/volume, no earnings risk. IDEAL for premium.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AAPL</strong></td>
+                            <td class="text-center"><span class="badge badge-success">GOOD</span></td>
+                            <td>Liquid options. Watch earnings windows. Cost basis $199 (Rollover IRA tax-deferred).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>GOOGL</strong></td>
+                            <td class="text-center"><span class="badge badge-success">GOOD</span></td>
+                            <td>Liquid options. Roth IRA = tax-free gains. Limited to 6 contracts (600 shares).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ARM</strong></td>
+                            <td class="text-center"><span class="badge badge-warning">CAUTION</span></td>
+                            <td>Wide bid-ask spreads ($2-3!), high IV (~55%), extreme gap risk. Position underwater. Low priority.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FBGRX</strong></td>
+                            <td class="text-center"><span class="badge badge-danger">INELIGIBLE</span></td>
+                            <td>Mutual fund - not optionable</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FICDX</strong></td>
+                            <td class="text-center"><span class="badge badge-danger">INELIGIBLE</span></td>
+                            <td>Mutual fund - not optionable</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MINDX</strong></td>
+                            <td class="text-center"><span class="badge badge-danger">INELIGIBLE</span></td>
+                            <td>Mutual fund - not optionable</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 4: Covered Call Program -->
+        <section id="covered-calls" class="section">
+            <h2>4. Covered Call Program</h2>
+            <p><strong>Objective:</strong> Generate supplemental income while minimizing assignment risk and preserving long-term growth. Priority: avoid triggering taxable sales.</p>
+
+            <h3 id="cc-rules">4.1 Eligibility Rules</h3>
+            <div class="two-col">
+                <div>
+                    <h4>Minimum Liquidity Thresholds</h4>
+                    <ul>
+                        <li>Bid-ask spread < 2% of premium</li>
+                        <li>Open Interest > 500</li>
+                        <li>Volume > 100/day</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Avoid Writing When</h4>
+                    <ul>
+                        <li>Within 2 weeks of earnings</li>
+                        <li>Near ex-dividend dates (early assignment risk)</li>
+                        <li>Strike below cost basis (forced taxable gain)</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top: 15px;"><strong>Strike Selection:</strong> Growth-first approach means targeting delta 0.08-0.22, leaving substantial upside room.</p>
+
+            <h3 id="cc-qqq">4.2 QQQ Recommendations</h3>
+            <div class="rec-card recommended">
+                <div class="rec-card-header">
+                    <h4>📈 QQQ (3,200 shares = 32 contracts max)</h4>
+                    <span class="badge badge-success">PRIMARY CANDIDATE</span>
+                </div>
+                <p>ETF structure eliminates earnings gap risk. Excellent liquidity. No dividend early-assignment risk.</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Contract</th>
+                                <th class="text-center">Delta</th>
+                                <th class="text-center">IV</th>
+                                <th class="text-right">Mid Premium</th>
+                                <th class="text-center">% OTM</th>
+                                <th class="text-center">Ann. Yield</th>
+                                <th class="text-center">Contracts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #E6FFFA;">
+                                <td><strong>Ultra-Conservative</strong></td>
+                                <td>Mar $645 Call</td>
+                                <td class="text-center">0.27</td>
+                                <td class="text-center">17.7%</td>
+                                <td class="text-right">$6.80</td>
+                                <td class="text-center">5.5%</td>
+                                <td class="text-center">6.7%</td>
+                                <td class="text-center">20</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Conservative</strong></td>
+                                <td>Mar $640 Call</td>
+                                <td class="text-center">0.31</td>
+                                <td class="text-center">18.2%</td>
+                                <td class="text-right">$8.46</td>
+                                <td class="text-center">4.7%</td>
+                                <td class="text-center">8.3%</td>
+                                <td class="text-center">20</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-success">
+                    <strong>✓ Recommendation</strong>
+                    Write 20 QQQ Mar $645 calls @ ~$6.80 = <strong>$13,600 premium</strong>. Caps upside at $645 (5.5% above current). Assignment probability ~15-20%.
+                </div>
+            </div>
+
+            <h3 id="cc-aapl">4.3 AAPL Recommendations</h3>
+            <div class="rec-card recommended">
+                <div class="rec-card-header">
+                    <h4>🍎 AAPL (5,000 shares = 50 contracts max)</h4>
+                    <span class="badge badge-warning">WAIT FOR EARNINGS</span>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ IMPORTANT</strong>
+                    Next earnings expected late Jan/early Feb. Defer writing until after earnings or use April expiration to avoid gap risk.
+                </div>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Contract</th>
+                                <th class="text-center">Delta</th>
+                                <th class="text-center">IV</th>
+                                <th class="text-right">Mid Premium</th>
+                                <th class="text-center">% OTM</th>
+                                <th class="text-center">Ann. Yield</th>
+                                <th class="text-center">Contracts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #E6FFFA;">
+                                <td><strong>Ultra-Conservative</strong></td>
+                                <td>Apr $280 Call</td>
+                                <td class="text-center">0.21</td>
+                                <td class="text-center">24.5%</td>
+                                <td class="text-right">$3.22</td>
+                                <td class="text-center">12.1%</td>
+                                <td class="text-center">5.3%</td>
+                                <td class="text-center">30</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Conservative</strong></td>
+                                <td>Apr $275 Call</td>
+                                <td class="text-center">0.25</td>
+                                <td class="text-center">24.6%</td>
+                                <td class="text-right">$4.25</td>
+                                <td class="text-center">10.1%</td>
+                                <td class="text-center">7.0%</td>
+                                <td class="text-center">30</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-success">
+                    <strong>✓ Recommendation</strong>
+                    Post-earnings, write 30 AAPL Apr $280 calls @ ~$3.22 = <strong>$9,660 premium</strong>. Limits coverage to 60% of position to preserve upside.
+                </div>
+            </div>
+
+            <h3 id="cc-googl">4.4 GOOGL Recommendations</h3>
+            <div class="rec-card recommended">
+                <div class="rec-card-header">
+                    <h4>🔍 GOOGL (600 shares = 6 contracts max)</h4>
+                    <span class="badge badge-info">ROTH IRA</span>
+                </div>
+                <p>Roth IRA position. Tax-free gains mean assignment is less problematic, but growth preference still applies.</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Contract</th>
+                                <th class="text-center">Delta</th>
+                                <th class="text-center">IV</th>
+                                <th class="text-right">Mid Premium</th>
+                                <th class="text-center">% OTM</th>
+                                <th class="text-center">Ann. Yield</th>
+                                <th class="text-center">Contracts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #E6FFFA;">
+                                <td><strong>Ultra-Conservative</strong></td>
+                                <td>Mar $360 Call</td>
+                                <td class="text-center">0.27</td>
+                                <td class="text-center">34.4%</td>
+                                <td class="text-right">$6.70</td>
+                                <td class="text-center">10.8%</td>
+                                <td class="text-center">12.4%</td>
+                                <td class="text-center">4</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Conservative</strong></td>
+                                <td>Mar $355 Call</td>
+                                <td class="text-center">0.30</td>
+                                <td class="text-center">34.3%</td>
+                                <td class="text-right">$7.85</td>
+                                <td class="text-center">9.3%</td>
+                                <td class="text-center">14.5%</td>
+                                <td class="text-center">4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-success">
+                    <strong>✓ Recommendation</strong>
+                    Write 4 GOOGL Mar $360 calls @ ~$6.70 = <strong>$2,680 premium</strong>. Covers 4 of 6 contracts.
+                </div>
+            </div>
+
+            <h3 id="cc-arm">4.5 ARM - DO NOT WRITE</h3>
+            <div class="rec-card avoid">
+                <div class="rec-card-header">
+                    <h4>⚠️ ARM (1,000 shares = 10 contracts max)</h4>
+                    <span class="badge badge-danger">NOT RECOMMENDED</span>
+                </div>
+                
+                <div class="alert alert-danger">
+                    <strong>🚫 NOT RECOMMENDED for covered calls</strong>
+                </div>
+                
+                <div class="two-col">
+                    <div>
+                        <h4>Reasons to Avoid:</h4>
+                        <ol>
+                            <li><strong>Wide bid-ask spreads</strong> ($2-3 on many strikes) - execution slippage erodes premium</li>
+                            <li><strong>Position is underwater</strong> (cost $138.59 vs current $108.55) - writing calls locks in loss if assigned</li>
+                            <li><strong>Extreme gap risk</strong> - ARM can move 15-20% on earnings</li>
+                            <li><strong>High beta</strong> (2.43) means rapid moves that could trigger assignment</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4>Wait For:</h4>
+                        <ul>
+                            <li>Stock to recover above cost basis ($138+)</li>
+                            <li>IV to spike further on a specific catalyst</li>
+                            <li>Clearer catalyst resolution</li>
+                            <li>Bid-ask spreads to tighten</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3 id="cc-summary">4.6 Portfolio Premium Summary</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th class="text-center">Contracts</th>
+                            <th class="text-right">Premium</th>
+                            <th class="text-center">Cycle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>QQQ Mar $645 Call</td>
+                            <td class="text-center">20</td>
+                            <td class="text-right">$13,600</td>
+                            <td class="text-center">~60 days</td>
+                        </tr>
+                        <tr>
+                            <td>AAPL Apr $280 Call</td>
+                            <td class="text-center">30</td>
+                            <td class="text-right">$9,660</td>
+                            <td class="text-center">~90 days</td>
+                        </tr>
+                        <tr>
+                            <td>GOOGL Mar $360 Call</td>
+                            <td class="text-center">4</td>
+                            <td class="text-right">$2,680</td>
+                            <td class="text-center">~60 days</td>
+                        </tr>
+                        <tr style="background: #E6FFFA; font-weight: bold;">
+                            <td>TOTAL</td>
+                            <td class="text-center">54</td>
+                            <td class="text-right">$25,940</td>
+                            <td class="text-center">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-label">Monthly Premium Est.</div>
+                    <div class="stat-value">$10-13K</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Annualized Yield</div>
+                    <div class="stat-value">6-8%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Upside Cap Impact</div>
+                    <div class="stat-value">5-12%</div>
+                </div>
+            </div>
+
+            <h3 id="cc-management">4.7 Management Rules</h3>
+            <div class="two-col">
+                <div>
+                    <h4>🎯 Close Early Triggers</h4>
+                    <ul>
+                        <li>Close position when <strong>50-75% of premium</strong> is captured (e.g., sold for $6.80, buy back at $1.70-3.40)</li>
+                        <li>Close if delta rises above <strong>0.40</strong> (assignment risk elevated)</li>
+                    </ul>
+                    
+                    <h4>🔄 Roll Triggers</h4>
+                    <ul>
+                        <li>If price approaches strike with 2+ weeks to expiration: <strong>Roll UP and OUT</strong> (higher strike, later expiration) to avoid assignment</li>
+                        <li>Prefer rolling to next monthly cycle at same or higher strike</li>
+                        <li>Accept debit to roll if necessary to preserve position</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>🚫 Do-Not-Write Rules</h4>
+                    <ul>
+                        <li>No new positions within <strong>14 days of earnings</strong> announcement</li>
+                        <li>No new positions if <strong>VIX < 14</strong> (premium too thin)</li>
+                        <li>No new positions on ARM until stock > $125 or clear catalyst</li>
+                        <li>No positions expiring same week as Fed meeting</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Hedging Plan -->
+        <section id="hedging" class="section">
+            <h2>5. Hedging Plan</h2>
+            <p>Given extreme tech concentration and growth preference, hedging should focus on tail-risk protection rather than steady income. Use QQQ puts to hedge the entire portfolio given ~82% QQQ/tech overlap.</p>
+
+            <h3 id="hedge-spread">5.1 Recommended Hedge: QQQ Put Spread</h3>
+            <div class="rec-card recommended">
+                <div class="rec-card-header">
+                    <h4>📉 QQQ Apr Put Spread</h4>
+                    <span class="badge badge-success">RECOMMENDED</span>
+                </div>
+                <p><strong>Strategy:</strong> Buy protective put spread to limit downside in severe correction, financed partially by covered call premium.</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Leg</th>
+                                <th>Contract</th>
+                                <th class="text-right">Cost/Credit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Buy Put</td>
+                                <td>Apr $580 Put (delta -0.29)</td>
+                                <td class="text-right">$13.80 debit</td>
+                            </tr>
+                            <tr>
+                                <td>Sell Put</td>
+                                <td>Apr $550 Put (delta -0.18)</td>
+                                <td class="text-right">$8.40 credit</td>
+                            </tr>
+                            <tr style="background: #E6FFFA; font-weight: bold;">
+                                <td>Net Cost</td>
+                                <td>Per spread</td>
+                                <td class="text-right">$5.40 ($540/spread)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="highlight-box">
+                    <h4>Position Sizing & Coverage</h4>
+                    <p><strong>15 spreads = $8,100 cost</strong>, protects $45,000 of downside between $550-580.</p>
+                    <p><strong>Coverage:</strong> ~$3M notional (portfolio value)</p>
+                    
+                    <h4 style="margin-top: 20px;">In a -20% SPY Crash:</h4>
+                    <ul>
+                        <li>QQQ likely falls 24-28% given beta</li>
+                        <li>Portfolio unhedged loss: ~$940K</li>
+                        <li>Spread payoff: ~$35K (reduces loss to ~$905K)</li>
+                        <li><strong>Hedge ROI in crash: 4.3x cost</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 id="hedge-collar">5.2 Alternative: Collar Strategy</h3>
+            <div class="rec-card caution">
+                <div class="rec-card-header">
+                    <h4>🔒 Zero-Cost Collar</h4>
+                    <span class="badge badge-warning">ALTERNATIVE</span>
+                </div>
+                <p>If you want zero-cost protection, combine covered calls with protective puts:</p>
+                
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">Sell</div>
+                        <div class="stat-value" style="font-size: 16px;">20 QQQ Mar $640 C @ $8.46</div>
+                        <div style="color: var(--success);">= $16,920 credit</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Buy</div>
+                        <div class="stat-value" style="font-size: 16px;">20 QQQ Mar $580 P @ $10.37</div>
+                        <div style="color: var(--danger);">= $20,740 debit</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Net Cost</div>
+                        <div class="stat-value">$3,820</div>
+                        <div>for 60-day collar</div>
+                    </div>
+                </div>
+                
+                <p>Limits downside to -5% but caps upside at +4.7%.</p>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ CONFLICT with growth preference</strong>
+                    Collar significantly caps upside. Only use if risk tolerance is lower than stated.
+                </div>
+            </div>
+
+            <h3>5.3 Annual Hedge Budget</h3>
+            <div class="highlight-box">
+                <p><strong>Recommended:</strong> Allocate 20-30% of annual call premium (~$30K-40K/year) to put protection.</p>
+                <p><strong>Current recommendation:</strong> $8,100 for 90-day protection = ~$32K/year run rate.</p>
+                <p>This provides meaningful tail-risk protection without materially eroding income.</p>
+            </div>
+        </section>
+
+        <!-- Section 6: Opportunities -->
+        <section id="opportunities" class="section">
+            <h2>6. Opportunities & Optimizations</h2>
+
+            <h3>6.1 Non-Sale Risk Reductions</h3>
+            <p>Given constraint against selling, improvements must come from overlays and new contributions:</p>
+            <ol>
+                <li><strong>Direct new contributions</strong> to non-tech sectors (healthcare, financials, energy)</li>
+                <li><strong>Consider QQQM</strong> if adding to QQQ position (lower expense ratio)</li>
+                <li><strong>Use covered call proceeds</strong> to purchase protective puts (recommended above)</li>
+                <li><strong>Review mutual fund holdings</strong> (FBGRX, FICDX, MINDX) - if exchanges are permitted within fund family, consider diversifying into value/bond funds</li>
+            </ol>
+
+            <h3>6.2 Favorable Options Pricing</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th class="text-center">IV Level</th>
+                            <th>Assessment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>QQQ</strong></td>
+                            <td class="text-center">~18-21%</td>
+                            <td><span class="badge badge-success">Sweet Spot</span> Good premium without extreme gap risk</td>
+                        </tr>
+                        <tr>
+                            <td><strong>GOOGL</strong></td>
+                            <td class="text-center">~34-36%</td>
+                            <td><span class="badge badge-success">Attractive</span> Elevated relative to realized vol</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AAPL</strong></td>
+                            <td class="text-center">~25-28%</td>
+                            <td><span class="badge badge-info">Reasonable</span> Post-earnings IV crush can be captured</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ARM</strong></td>
+                            <td class="text-center">~53-55%</td>
+                            <td><span class="badge badge-warning">Avoid</span> Very high but bid-ask spreads destroy edge</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 id="execution">6.3 90-Day Execution Plan</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Week 1-2 (Immediate)</h4>
+                    <ol>
+                        <li>Execute QQQ Mar $645 calls (20 contracts) - no earnings risk</li>
+                        <li>Execute GOOGL Mar $360 calls (4 contracts) - check earnings calendar first</li>
+                        <li>Implement QQQ put spread hedge (15 contracts)</li>
+                    </ol>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Week 3-4 (Post-AAPL Earnings)</h4>
+                    <ol start="4">
+                        <li>After AAPL Q1 earnings release, execute AAPL Apr $280 calls (30 contracts)</li>
+                        <li>Monitor existing positions daily for roll triggers</li>
+                    </ol>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Week 5-8 (Maintenance)</h4>
+                    <ol start="6">
+                        <li>Close any position at 75% profit</li>
+                        <li>Roll threatened positions before delta > 0.40</li>
+                        <li>Review ARM for potential entry if stock recovers</li>
+                    </ol>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Week 9-12 (Cycle Reset)</h4>
+                    <ol start="9">
+                        <li>As March expiration approaches, evaluate new positions</li>
+                        <li>Roll or close QQQ/GOOGL positions</li>
+                        <li>Renew hedge if put spreads expire worthless (good outcome)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Weekly Checklist</h3>
+            <ul class="checklist">
+                <li><span class="checkbox"></span> Check earnings calendar for all holdings</li>
+                <li><span class="checkbox"></span> Review delta on all open call positions</li>
+                <li><span class="checkbox"></span> Confirm no ex-dividend dates approaching</li>
+                <li><span class="checkbox"></span> Monitor VIX level (pause if < 14)</li>
+                <li><span class="checkbox"></span> Track premium capture % on each position</li>
+            </ul>
+        </section>
+
+        <!-- Section 7: Questions -->
+        <section id="questions" class="section">
+            <h2>7. Questions & Assumptions</h2>
+            <p>The following questions would materially change recommendations:</p>
+
+            <div class="rec-card">
+                <h4>1. Tax Treatment of Rollover IRA</h4>
+                <p><strong>Current assumption:</strong> Tax-deferred (no immediate tax on assignment/gains). If this is a SIMPLE IRA or has other restrictions, covered call treatment may differ.</p>
+            </div>
+
+            <div class="rec-card">
+                <h4>2. Willingness to Realize Gains Under Any Circumstance</h4>
+                <p><strong>Current assumption:</strong> Strong preference to avoid. If there's a price level or circumstance where assignment would be acceptable (e.g., AAPL > $300), strike selection could be more aggressive.</p>
+            </div>
+
+            <div class="rec-card">
+                <h4>3. Margin Permissions & Option Approval Level</h4>
+                <p><strong>Current assumption:</strong> Standard Level 2 options (covered calls, cash-secured puts, long options). If Level 3+ approved, could consider more complex strategies (spreads directly, rather than separate legs).</p>
+            </div>
+
+            <div class="rec-card">
+                <h4>4. Total Portfolio Context</h4>
+                <p><strong>Current assumption:</strong> These two accounts represent primary liquid net worth. If you have other assets (real estate, bonds, 401k elsewhere), the extreme equity concentration may be more tolerable.</p>
+            </div>
+
+            <div class="rec-card">
+                <h4>5. Income Needs vs. Total Return</h4>
+                <p><strong>Current assumption:</strong> Premium income is supplemental; growth is priority. If regular income is needed, more aggressive call writing (higher delta, more contracts) could be considered despite upside cap.</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p><strong>— END OF ANALYSIS —</strong></p>
+            <p style="margin-top: 15px;">This analysis is for informational purposes only and does not constitute investment advice. Options involve risk and are not suitable for all investors. Past performance does not guarantee future results.</p>
+            <p style="margin-top: 10px;">Generated: January 22, 2026</p>
+        </footer>
+    </main>
+
+    <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Highlight active nav item on scroll
+        const sections = document.querySelectorAll('section[id], h3[id]');
+        const navLinks = document.querySelectorAll('.nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
