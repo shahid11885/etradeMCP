@@ -7,10 +7,38 @@ import os
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
-from etrade_core.auth import get_session
+from etrade_core.auth import get_session, KEYRING_SERVICE, _HAS_KEYRING
 from etrade_core.accounts.accounts import Accounts
 from etrade_core.market.market import Market
 
+
+def store_keychain_credentials():
+    """Stores E*TRADE consumer key and secret in macOS Keychain."""
+    if not _HAS_KEYRING:
+        print("ERROR: 'keyring' package is not installed. Run: pip install keyring")
+        return
+
+    import keyring
+
+    env_menu = {"1": "PROD", "2": "SANDBOX", "3": "Cancel"}
+    print("")
+    for key, val in env_menu.items():
+        print(f"{key})\t{val}")
+    choice = input("Select environment: ")
+    env = env_menu.get(choice)
+    if not env or env == "Cancel":
+        return
+
+    consumer_key = input(f"Enter {env} Consumer Key: ").strip()
+    consumer_secret = input(f"Enter {env} Consumer Secret: ").strip()
+    if not consumer_key or not consumer_secret:
+        print("ERROR: Both key and secret are required.")
+        return
+
+    keyring.set_password(KEYRING_SERVICE, f"{env}_CONSUMER_KEY", consumer_key)
+    keyring.set_password(KEYRING_SERVICE, f"{env}_CONSUMER_SECRET", consumer_secret)
+    print(f"{env} credentials stored in Keychain successfully.")
+    print("Set USE_KEYRING_ETRADEKEYS = true in config.ini to use them.")
 
 def oauth():
     """Allows user authorization for the sample application with OAuth 1"""
@@ -65,6 +93,8 @@ if __name__ == "__main__":
             print("Tokens generated and saved successfully in 'config/tokens.json'.")
         except Exception as e:
             print(f"An error occurred during token generation: {e}")
+    elif len(sys.argv) > 1 and sys.argv[1] == "setup-keychain":
+        store_keychain_credentials()
     else:
         oauth()
 

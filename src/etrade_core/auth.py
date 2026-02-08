@@ -9,6 +9,14 @@ import datetime
 from rauth import OAuth1Service
 from .client_logger import logger
 
+try:
+    import keyring
+    _HAS_KEYRING = True
+except ImportError:
+    _HAS_KEYRING = False
+
+KEYRING_SERVICE = "etrade-mcp"
+
 # loading configuration file
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 config = configparser.ConfigParser()
@@ -34,18 +42,31 @@ def _validate_credentials(key, secret, key_type):
         print(f"ERROR: {key_type} CONSUMER_SECRET must be at least 60 alphanumeric characters long.")
         sys.exit(1)
 
+def _get_credentials_from_keyring(env):
+    """Reads consumer key and secret from macOS Keychain."""
+    if not _HAS_KEYRING:
+        print("ERROR: 'keyring' package is not installed. Run: pip install keyring")
+        sys.exit(1)
+    consumer_key = keyring.get_password(KEYRING_SERVICE, f"{env}_CONSUMER_KEY")
+    consumer_secret = keyring.get_password(KEYRING_SERVICE, f"{env}_CONSUMER_SECRET")
+    if not consumer_key or not consumer_secret:
+        print(f"ERROR: {env} credentials not found in Keychain.")
+        print("Run the CLI and use 'Store credentials in Keychain' to set them up.")
+        sys.exit(1)
+    return consumer_key, consumer_secret
+
 def get_etrade_service(env="PROD"):
     """Initializes and returns the OAuth1Service"""
-    if env == "PROD":
-        consumer_key        = config["DEFAULT"]["PROD_CONSUMER_KEY"]
-        consumer_secret     = config["DEFAULT"]["PROD_CONSUMER_SECRET"]
-        base_url            = config["DEFAULT"]["PROD_BASE_URL"]
-        _validate_credentials(consumer_key, consumer_secret, "PROD")
-    else:  # SANDBOX
-        consumer_key        = config["DEFAULT"]["SANDBOX_CONSUMER_KEY"]
-        consumer_secret     = config["DEFAULT"]["SANDBOX_CONSUMER_SECRET"]
-        base_url            = config["DEFAULT"]["SANDBOX_BASE_URL"]
-        _validate_credentials(consumer_key, consumer_secret, "SANDBOX")
+    base_url = config["DEFAULT"][f"{env}_BASE_URL"]
+    use_keyring = config["DEFAULT"].get("USE_KEYRING_ETRADEKEYS", "false").lower() == "true"
+
+    if use_keyring:
+        consumer_key, consumer_secret = _get_credentials_from_keyring(env)
+    else:
+        consumer_key    = config["DEFAULT"][f"{env}_CONSUMER_KEY"]
+        consumer_secret = config["DEFAULT"][f"{env}_CONSUMER_SECRET"]
+
+    _validate_credentials(consumer_key, consumer_secret, env)
 
     return OAuth1Service(
         name                = "etrade",
