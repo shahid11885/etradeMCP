@@ -38,6 +38,14 @@ For **Prompt 2: Uploaded Portfolio Analysis**, we utilized the input data from `
 The true power of this approach is unlocked when you combine it with a detailed and sophisticated prompt. A well-crafted prompt can guide the LLM to perform a deep analysis of your portfolio, identify risks, and even suggest income-generating strategies.
 
 **[Prompt 1: E*TRADE Portfolio Analysis](prompts/prompt-1-etrade-portfolio.md)** - Analyzes a portfolio fetched directly from your E*TRADE account, focusing on risk management and generating passive income through a low-risk covered call program.
+*Copy and paste the below prompt into your chatbot, preferably Claude:*
+
+```claude
+Fetch the prompt from here : https://shahid11885.github.io/etradeMCP/prompts/prompt-1-etrade-portfolio.md
+
+And render the output in pleasing UI using html
+
+```
 
 ### The Prompt Explained
 
@@ -52,6 +60,14 @@ This prompt is a detailed set of instructions for the LLM, now supercharged with
 ---
 
 **[Prompt 2: Uploaded Portfolio Analysis](prompts/prompt-2-uploaded-portfolio.md)** - Analyzes an ***uploaded*** portfolio (e.g., from a CSV file), focusing on risk management and generating passive income through a low-risk covered call program.
+*Copy and paste the below prompt into your chatbot, preferably Claude:*
+
+```claude
+Fetch the prompt from here : https://shahid11885.github.io/etradeMCP/prompts/prompt-2-uploaded-portfolio.md
+
+And render the output in pleasing UI using html
+
+```
 
 ### The Prompt Explained
 
