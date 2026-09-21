@@ -333,3 +333,59 @@ class Market:
         theta = greeks.get("theta", 0)
 
         print(f"  {strike:>10.2f} {last:>10.2f} {bid:>10.2f} {ask:>10.2f} {volume:>10,} {open_int:>10,} {iv:>9.1f}% {delta:>8.3f} {theta:>8.3f}")
+
+    def fetch_option_greeks(self, symbol, expiry_year=None, expiry_month=None, expiry_day=None,
+                            chain_type="CALLPUT", strike_price_near=None, no_of_strikes=None,
+                            include_weekly=False, skip_adjusted=True):
+        """
+        Fetches option Greeks for a given symbol as a flat list of contracts.
+
+        Thin wrapper over fetch_option_chains() that drops the fields a Greeks
+        question never needs. If no expiry is given, E*TRADE returns the nearest
+        expiration.
+
+        :return: List of dicts, one per contract, with identity, pricing and Greeks.
+                 Greek values are None when E*TRADE omits them for that contract.
+        """
+        chain_response = self.fetch_option_chains(
+            symbol, expiry_year, expiry_month, expiry_day,
+            chain_type, strike_price_near, no_of_strikes,
+            include_weekly, skip_adjusted
+        )
+
+        # Expiry lives on the response, not on each contract
+        selected = chain_response.get("SelectedED", {})
+        try:
+            expiry = "{:04d}-{:02d}-{:02d}".format(
+                int(selected["year"]), int(selected["month"]), int(selected["day"])
+            )
+        except (KeyError, TypeError, ValueError):
+            expiry = None
+
+        contracts = []
+        for pair in chain_response.get("OptionPair", []):
+            for kind in ("Call", "Put"):
+                option = pair.get(kind)
+                if not option:
+                    continue
+
+                greeks = option.get("OptionGreeks") or {}
+                contracts.append({
+                    "symbol": option.get("symbol", symbol.upper()),
+                    "optionType": option.get("optionType", kind.upper()),
+                    "strikePrice": option.get("strikePrice"),
+                    "expiry": expiry,
+                    "bid": option.get("bid"),
+                    "ask": option.get("ask"),
+                    "lastPrice": option.get("lastPrice"),
+                    "volume": option.get("volume"),
+                    "openInterest": option.get("openInterest"),
+                    "iv": greeks.get("iv"),
+                    "delta": greeks.get("delta"),
+                    "gamma": greeks.get("gamma"),
+                    "theta": greeks.get("theta"),
+                    "vega": greeks.get("vega"),
+                    "rho": greeks.get("rho"),
+                })
+
+        return contracts

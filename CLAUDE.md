@@ -69,6 +69,7 @@ The server exposes these tools to LLM clients:
 - `get_quote(symbols)` - Real-time stock quotes
 - `get_option_expire_dates(symbol)` - Option expiration dates
 - `get_option_chains(symbol, ...)` - Full option chain data with Greeks
+- `get_option_greeks(symbol, ...)` - Flat per-contract list of Greeks (iv, delta, gamma, theta, vega, rho) - lighter than the full chain
 
 ### Environment Modes
 

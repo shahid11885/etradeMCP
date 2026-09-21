@@ -124,6 +124,32 @@ def main():
     else:
         print("\n7. Skipping 'get_option_chains' (no expiry date available).")
 
+    # 8. Get Option Greeks
+    if exp_year:
+        print(f"\n8. Testing 'get_option_greeks' for AAPL expiring on {exp_month}/{exp_day}/{exp_year}...")
+        try:
+            contracts = market_client.fetch_option_greeks(
+                "AAPL",
+                expiry_year=exp_year,
+                expiry_month=exp_month,
+                expiry_day=exp_day,
+                chain_type="CALLPUT",
+                no_of_strikes=2
+            )
+            print(f"   Retrieved {len(contracts)} contracts.")
+            if contracts:
+                c = contracts[0]
+                print(f"   Sample: {c.get('optionType')} ${c.get('strikePrice')} exp {c.get('expiry')}")
+                print(f"   Greeks: iv={c.get('iv')} delta={c.get('delta')} gamma={c.get('gamma')} "
+                      f"theta={c.get('theta')} vega={c.get('vega')} rho={c.get('rho')}")
+                missing = [x for x in contracts if x.get("delta") is None]
+                if missing:
+                    print(f"   Note: {len(missing)} of {len(contracts)} contracts had no Greeks data.")
+        except Exception as e:
+            print(f"   Failed: {e}")
+    else:
+        print("\n8. Skipping 'get_option_greeks' (no expiry date available).")
+
     print("\n--- Test Complete ---")
 
 if __name__ == "__main__":
