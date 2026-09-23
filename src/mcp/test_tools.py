@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+from datetime import datetime
 
 # Add project root to sys.path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -33,8 +34,11 @@ def main():
         accounts = accounts_client.fetch_account_list()
         print(f"   Found {len(accounts)} accounts.")
         if accounts:
-            first_acct = accounts[0]
-            print(f"   First Account ID: {first_acct.get('accountId')}")
+            # Prefer an active account -- closed accounts make some endpoints
+            # (notably transactions) stall instead of returning cleanly.
+            active = [a for a in accounts if a.get('accountStatus') != 'CLOSED']
+            first_acct = active[0] if active else accounts[0]
+            print(f"   Using Account ID: {first_acct.get('accountId')} ({first_acct.get('accountStatus')})")
             account_id_key = first_acct.get('accountIdKey')
     except Exception as e:
         print(f"   Failed: {e}")
@@ -65,8 +69,33 @@ def main():
     except Exception as e:
         print(f"   Failed: {e}")
 
-    # 5. Get Quote
-    print("\n5. Testing 'get_quote' for AAPL...")
+    # 5. List Transactions (trailing 12 months; the default window is often empty)
+    today = datetime.now()
+    end_date = today.strftime("%m%d%Y")
+    start_date = today.replace(year=today.year - 1).strftime("%m%d%Y")
+    print(f"\n5. Testing 'list_transactions' for account {account_id_key} "
+          f"({start_date} - {end_date})...")
+    # This endpoint stalls intermittently, so give it one retry before failing.
+    for attempt in (1, 2):
+        try:
+            data = accounts_client.fetch_transactions(account_id_key, start_date=start_date,
+                                                      end_date=end_date, sort_order="DESC", count=5)
+            if data and "TransactionListResponse" in data:
+                resp = data["TransactionListResponse"]
+                txns = resp.get("Transaction", [])
+                print(f"   Retrieved {len(txns)} transactions (more available: {resp.get('moreTransactions')}).")
+                if txns:
+                    t = txns[0]
+                    print(f"   Most recent: {t.get('transactionType')} | "
+                          f"amount={t.get('amount')} | date={t.get('transactionDate')}")
+            else:
+                print("   No transactions in this window (204).")
+            break
+        except Exception as e:
+            print(f"   Attempt {attempt} failed: {e}")
+
+    # 6. Get Quote
+    print("\n6. Testing 'get_quote' for AAPL...")
     try:
         quotes = market_client.fetch_quote(["AAPL"])
         if quotes:
@@ -78,8 +107,8 @@ def main():
     except Exception as e:
         print(f"   Failed: {e}")
 
-    # 6. Get Option Expiry Dates
-    print("\n6. Testing 'get_option_expire_dates' for AAPL...")
+    # 7. Get Option Expiry Dates
+    print("\n7. Testing 'get_option_expire_dates' for AAPL...")
     try:
         dates = market_client.fetch_option_expire_dates("AAPL")
         if dates:
@@ -98,9 +127,9 @@ def main():
         print(f"   Failed: {e}")
         exp_year, exp_month, exp_day = None, None, None
 
-    # 7. Get Option Chains
+    # 8. Get Option Chains
     if exp_year:
-        print(f"\n7. Testing 'get_option_chains' for AAPL expiring on {exp_month}/{exp_day}/{exp_year}...")
+        print(f"\n8. Testing 'get_option_chains' for AAPL expiring on {exp_month}/{exp_day}/{exp_year}...")
         try:
             chain = market_client.fetch_option_chains(
                 "AAPL", 
@@ -122,11 +151,11 @@ def main():
         except Exception as e:
             print(f"   Failed: {e}")
     else:
-        print("\n7. Skipping 'get_option_chains' (no expiry date available).")
+        print("\n8. Skipping 'get_option_chains' (no expiry date available).")
 
-    # 8. Get Option Greeks
+    # 9. Get Option Greeks
     if exp_year:
-        print(f"\n8. Testing 'get_option_greeks' for AAPL expiring on {exp_month}/{exp_day}/{exp_year}...")
+        print(f"\n9. Testing 'get_option_greeks' for AAPL expiring on {exp_month}/{exp_day}/{exp_year}...")
         try:
             contracts = market_client.fetch_option_greeks(
                 "AAPL",
@@ -148,7 +177,7 @@ def main():
         except Exception as e:
             print(f"   Failed: {e}")
     else:
-        print("\n8. Skipping 'get_option_greeks' (no expiry date available).")
+        print("\n9. Skipping 'get_option_greeks' (no expiry date available).")
 
     print("\n--- Test Complete ---")
 

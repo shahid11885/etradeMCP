@@ -66,6 +66,7 @@ The server exposes these tools to LLM clients:
 - `list_accounts` - Get all brokerage accounts
 - `get_portfolio(account_id_key)` - Portfolio positions
 - `get_balance(account_id_key)` - Account balance
+- `list_transactions(account_id_key, start_date, end_date, ...)` - Transaction history (trades, dividends, fees); dates are MMDDYYYY, paginated via `marker`/`moreTransactions`
 - `get_quote(symbols)` - Real-time stock quotes
 - `get_option_expire_dates(symbol)` - Option expiration dates
 - `get_option_chains(symbol, ...)` - Full option chain data with Greeks

@@ -67,6 +67,33 @@ def get_balance(account_id_key: str) -> dict:
     return accts.fetch_balance(account_id_key)
 
 @mcp.tool()
+def list_transactions(account_id_key: str, start_date: str = None, end_date: str = None,
+                      sort_order: str = "DESC", count: int = None, marker: str = None) -> dict:
+    """
+    List the transaction history for a specific account: trades, dividends,
+    fees, interest and transfers.
+
+    Use this for questions about account activity over time (what was traded,
+    what was paid in fees). Use get_portfolio for current holdings instead.
+    Args:
+        account_id_key: The unique key for the account (available from list_accounts).
+        start_date: Start of the window in MMDDYYYY format (e.g. "01152026").
+                    If omitted, E*TRADE uses its own default window.
+        end_date: End of the window in MMDDYYYY format.
+        sort_order: "DESC" (newest first, default) or "ASC".
+        count: Number of transactions to return per page.
+        marker: Pagination cursor. Pass the "marker" value from a previous
+                response to fetch the next page.
+    Returns:
+        A dictionary containing the TransactionListResponse. Transaction dates
+        are epoch milliseconds. Check "moreTransactions" and re-call with
+        "marker" to page through a longer history.
+    """
+    accts, _ = get_clients()
+    return accts.fetch_transactions(account_id_key, start_date, end_date,
+                                    sort_order, marker, count)
+
+@mcp.tool()
 def get_quote(symbols: list[str]) -> list:
     """
     Get real-time quotes for one or more stock symbols.

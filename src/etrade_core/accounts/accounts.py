@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from datetime import datetime
 from ..order.order import Order
 from ..client_logger import logger
 
@@ -218,6 +219,104 @@ class Accounts:
         except Exception as e:
             print(f"Error: {e}")
 
+    def fetch_transactions(self, account_id_key, start_date=None, end_date=None,
+                           sort_order=None, marker=None, count=None, timeout=30):
+        """
+        Fetches the transaction history for a specific account.
+
+        :param start_date: Optional start of the window, MMDDYYYY.
+        :param end_date: Optional end of the window, MMDDYYYY.
+        :param sort_order: Optional "ASC" or "DESC".
+        :param marker: Optional pagination cursor from a previous response.
+        :param count: Optional number of transactions to return.
+        :param timeout: Seconds to wait for a response. This endpoint stalls
+                        intermittently, and rauth's 300s default is far too long
+                        to leave an MCP client hanging.
+        :return: Dict containing the TransactionListResponse, or None if empty.
+        """
+        url = self.base_url + "/v1/accounts/" + account_id_key + "/transactions.json"
+
+        # Sent for consistency with fetch_balance. Note: against a CLOSED account
+        # this endpoint stalls or answers "oauth_problem=nonce_used" instead of
+        # returning cleanly, so prefer an active account (the CLI already filters).
+        headers = {"consumerkey": self.consumer_key}
+
+        params = {}
+        if start_date: params["startDate"] = start_date
+        if end_date: params["endDate"] = end_date
+        if sort_order: params["sortOrder"] = sort_order
+        if marker: params["marker"] = marker
+        if count: params["count"] = count
+
+        response = self.session.get(url, header_auth=True, params=params,
+                                    headers=headers, timeout=timeout)
+        logger.debug("Request url: %s", url)
+        logger.debug("Request Header: %s", response.request.headers)
+
+        if response is not None and response.status_code == 200:
+            parsed = json.loads(response.text)
+            logger.debug("Response Body: %s", json.dumps(parsed, indent=4, sort_keys=True))
+            return response.json()
+        elif response is not None and response.status_code == 204:
+            return None
+        else:
+            logger.debug("Response Body: %s", response.text)
+            if response is not None and response.headers.get('Content-Type') == 'application/json':
+                error_data = response.json()
+                if "Error" in error_data and "message" in error_data["Error"]:
+                    raise Exception(error_data["Error"]["message"])
+            raise Exception("Transactions API service error")
+
+    def transactions(self):
+        """
+        Calls transactions API to retrieve the transaction history for a specified account
+        """
+        try:
+            data = self.fetch_transactions(self.account["accountIdKey"], sort_order="DESC")
+            print("\nTransactions:")
+
+            if data is None or "TransactionListResponse" not in data:
+                print("None")
+                return
+
+            transaction_list = data["TransactionListResponse"].get("Transaction", [])
+            if not transaction_list:
+                print("None")
+                return
+
+            for transaction in transaction_list:
+                print_str = ""
+                if "transactionDate" in transaction:
+                    print_str = print_str + "Date: " + self._format_transaction_date(transaction["transactionDate"])
+                if "transactionType" in transaction:
+                    print_str = print_str + " | " + "Type: " + str(transaction["transactionType"])
+                brokerage = transaction.get("brokerage") or transaction.get("Brokerage") or {}
+                product = brokerage.get("product") or brokerage.get("Product") or {}
+                if "symbol" in product:
+                    print_str = print_str + " | " + "Symbol: " + str(product["symbol"])
+                if "quantity" in brokerage:
+                    print_str = print_str + " | " + "Quantity #: " + str(brokerage["quantity"])
+                if "amount" in transaction:
+                    print_str = print_str + " | " + "Amount $: " \
+                                + str('${:,.2f}'.format(transaction["amount"]))
+                print(print_str)
+
+            if data["TransactionListResponse"].get("moreTransactions"):
+                print("\n(More transactions available)")
+        except Exception as e:
+            print(f"Error: {e}")
+
+    @staticmethod
+    def _format_transaction_date(value):
+        """
+        E*TRADE returns transaction dates as epoch milliseconds; render as MM/DD/YYYY.
+        Falls back to the raw value if it is not a timestamp.
+        """
+        try:
+            return datetime.fromtimestamp(int(value) / 1000).strftime("%m/%d/%Y")
+        except (TypeError, ValueError, OSError, OverflowError):
+            return str(value)
+
     def account_menu(self):
         """
         Provides the different options for the sample application: balance, portfolio, view orders
@@ -229,7 +328,8 @@ class Accounts:
             menu_items = {"1": "Balance",
                           "2": "Portfolio",
                           "3": "Orders",
-                          "4": "Go Back"}
+                          "4": "Transactions",
+                          "5": "Go Back"}
 
             while True:
                 print("")
@@ -246,6 +346,8 @@ class Accounts:
                     order = Order(self.session, self.account, self.base_url)
                     order.view_orders()
                 elif selection == "4":
+                    self.transactions()
+                elif selection == "5":
                     break
                 else:
                     print("Unknown Option Selected!")
