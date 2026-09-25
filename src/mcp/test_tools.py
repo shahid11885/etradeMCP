@@ -75,6 +75,7 @@ def main():
     start_date = today.replace(year=today.year - 1).strftime("%m%d%Y")
     print(f"\n5. Testing 'list_transactions' for account {account_id_key} "
           f"({start_date} - {end_date})...")
+    detail_txn = None
     # This endpoint stalls intermittently, so give it one retry before failing.
     for attempt in (1, 2):
         try:
@@ -88,11 +89,28 @@ def main():
                     t = txns[0]
                     print(f"   Most recent: {t.get('transactionType')} | "
                           f"amount={t.get('amount')} | date={t.get('transactionDate')}")
+                    detail_txn = t
             else:
                 print("   No transactions in this window (204).")
             break
         except Exception as e:
             print(f"   Attempt {attempt} failed: {e}")
+
+    # 5b. Transaction Details for the most recent transaction above
+    if detail_txn:
+        txid = detail_txn.get("transactionId")
+        print(f"\n5b. Testing 'get_transaction_details' for transaction {txid}...")
+        try:
+            det = accounts_client.fetch_transaction_details(
+                account_id_key, txid, store_id=detail_txn.get("storeId"))
+            resp = det.get("TransactionDetailsResponse", det)
+            print(f"   Retrieved details. Top-level keys: {sorted(resp.keys())}")
+            extra = sorted(set(resp.keys()) - set(detail_txn.keys()))
+            print(f"   Fields the list row did NOT have: {extra or 'none'}")
+        except Exception as e:
+            print(f"   Failed: {e}")
+    else:
+        print("\n5b. Skipping 'get_transaction_details' (no transaction available).")
 
     # 6. Get Quote
     print("\n6. Testing 'get_quote' for AAPL...")

@@ -94,6 +94,28 @@ def list_transactions(account_id_key: str, start_date: str = None, end_date: str
                                     sort_order, marker, count)
 
 @mcp.tool()
+def get_transaction_details(account_id_key: str, transaction_id: str, store_id: int = None) -> dict:
+    """
+    Get E*TRADE's detail record for a single transaction.
+
+    Prefer list_transactions: verified against a live equity trade, this returns
+    LESS than the corresponding list row. It adds only Category and orderNo
+    (both empty on the trade tested) and drops postDate, instType, storeId,
+    settlementDate and securityType -- and its Product.symbol came back blank
+    where the list row correctly said "AAPL". Note the response also capitalizes
+    Brokerage/Product, where list_transactions returns brokerage/product.
+    Args:
+        account_id_key: The unique key for the account (available from list_accounts).
+        transaction_id: The transactionId from a list_transactions row.
+        store_id: Optional storeId, carried on that row's detailsURI.
+    Returns:
+        A dictionary containing the TransactionDetailsResponse. Dates are epoch
+        milliseconds, as in list_transactions.
+    """
+    accts, _ = get_clients()
+    return accts.fetch_transaction_details(account_id_key, transaction_id, store_id)
+
+@mcp.tool()
 def get_quote(symbols: list[str]) -> list:
     """
     Get real-time quotes for one or more stock symbols.

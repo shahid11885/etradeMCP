@@ -267,6 +267,49 @@ class Accounts:
                     raise Exception(error_data["Error"]["message"])
             raise Exception("Transactions API service error")
 
+    def fetch_transaction_details(self, account_id_key, transaction_id,
+                                  store_id=None, timeout=30):
+        """
+        Fetches E*TRADE's detail record for a single transaction.
+
+        Verified against a live equity trade: this returns LESS than the
+        corresponding fetch_transactions() row. It adds Category and orderNo
+        (both empty there) but drops postDate, instType, storeId, settlementDate
+        and securityType, and its Product.symbol came back blank where the list
+        row correctly said "AAPL". It also capitalizes Brokerage/Product, where
+        the list response uses brokerage/product. Prefer the list row unless you
+        specifically need Category or orderNo.
+
+        :param transaction_id: The transactionId from a fetch_transactions() row.
+        :param store_id: Optional storeId, carried on the row's detailsURI.
+        :param timeout: Seconds to wait; see fetch_transactions().
+        :return: Dict containing the TransactionDetailsResponse.
+        """
+        url = (self.base_url + "/v1/accounts/" + account_id_key
+               + "/transactions/" + str(transaction_id) + ".json")
+
+        headers = {"consumerkey": self.consumer_key}
+
+        params = {}
+        if store_id is not None: params["storeId"] = store_id
+
+        response = self.session.get(url, header_auth=True, params=params,
+                                    headers=headers, timeout=timeout)
+        logger.debug("Request url: %s", url)
+        logger.debug("Request Header: %s", response.request.headers)
+
+        if response is not None and response.status_code == 200:
+            parsed = json.loads(response.text)
+            logger.debug("Response Body: %s", json.dumps(parsed, indent=4, sort_keys=True))
+            return response.json()
+        else:
+            logger.debug("Response Body: %s", response.text)
+            if response is not None and response.headers.get('Content-Type') == 'application/json':
+                error_data = response.json()
+                if "Error" in error_data and "message" in error_data["Error"]:
+                    raise Exception(error_data["Error"]["message"])
+            raise Exception("Transaction Details API service error")
+
     def transactions(self):
         """
         Calls transactions API to retrieve the transaction history for a specified account

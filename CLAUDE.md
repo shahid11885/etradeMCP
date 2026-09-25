@@ -67,6 +67,7 @@ The server exposes these tools to LLM clients:
 - `get_portfolio(account_id_key)` - Portfolio positions
 - `get_balance(account_id_key)` - Account balance
 - `list_transactions(account_id_key, start_date, end_date, ...)` - Transaction history (trades, dividends, fees); dates are MMDDYYYY, paginated via `marker`/`moreTransactions`
+- `get_transaction_details(account_id_key, transaction_id, store_id)` - E*TRADE's detail record for one transaction; in practice returns *less* than the `list_transactions` row (adds `Category`/`orderNo`, blanks `Product.symbol`), so prefer the list row
 - `get_quote(symbols)` - Real-time stock quotes
 - `get_option_expire_dates(symbol)` - Option expiration dates
 - `get_option_chains(symbol, ...)` - Full option chain data with Greeks

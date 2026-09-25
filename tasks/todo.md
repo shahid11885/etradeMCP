@@ -91,7 +91,42 @@ identical call sometimes times out. It is given one retry.
    `accounts[0]` — which happened to be a closed account and was the source of
    the early failures.
 
-### Follow-up not done
-The per-transaction details endpoint (`/transactions/{transactionId}`) is still
-unexposed; the list response carries a `detailsURI` per row. Worth adding if
-multi-leg option trades need their individual legs broken out.
+---
+
+## Follow-up: `get_transaction_details`
+
+Added `fetch_transaction_details()` (accounts.py), the `get_transaction_details`
+MCP tool (server.py), test step 5b, and a CLAUDE.md entry.
+
+### What the details endpoint actually returns
+Measured against a live equity trade (AAPL, sold 521 @ $342.54) by fetching the
+list row and the detail record for the same transactionId:
+
+| | list row | details |
+|---|---|---|
+| `Product.symbol` | `"AAPL"` + `securityType: "EQ"` | `" "` (blank) |
+| `postDate`, `instType`, `storeId`, `imageFlag`, `displaySymbol`, `settlementDate` | present | dropped |
+| `Category` | — | present but all-empty |
+| `orderNo` | — | present but `"0"` |
+| key casing | `brokerage` / `product` | `Brokerage` / `Product` |
+| `transactionId` type | string | integer |
+
+**The details endpoint returns less than the list row.** The only new fields are
+`Category` and `orderNo`, both empty on a real trade, and it loses the ticker
+symbol. The earlier guess that it would break out multi-leg option legs was
+docs-based and is not supported by the data.
+
+Kept anyway (built, tested, cheap), but the MCP docstring now steers clients to
+`list_transactions` first so an LLM does not spend a call on it by default.
+
+### Two more API gotchas
+- **Casing flips between the two endpoints**: list returns `brokerage`/`product`,
+  details returns `Brokerage`/`Product`. Code touching both must handle each.
+- **The documented URL is right, E*TRADE's own `detailsURI` is not the shape to
+  copy**: `/transactions/{id}.json` works; the `detailsURI` field advertises
+  `/transactions.json/{id}?storeId=0`, with `.json` before the id.
+
+### Verification
+Full `test_tools.py` passes all 10 steps, step 5b included. Step 5 timed out on
+its first attempt and succeeded on the retry -- more evidence for the
+intermittent-stall finding above.
